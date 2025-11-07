@@ -6,4 +6,11 @@ load_dotenv()
 
 url: str = os.environ.get("SUPABASE_URL")
 key: str = os.environ.get("SUPABASE_KEY")
-supabase: Client = create_client(url, key)
+
+supabase: Client = None
+if url and key:
+    try:
+        supabase = create_client(url, key)
+    except Exception as e:
+        print(f"Failed to create Supabase client: {e}")
+        supabase = None
