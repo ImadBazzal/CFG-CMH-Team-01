@@ -11,24 +11,26 @@ L.Icon.Default.mergeOptions({
   shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
 });
 
-// Custom marker icons
-const blueIcon = new L.Icon({
-  iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-blue.png',
-  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34],
-  shadowSize: [41, 41]
-});
+// Custom CSS-based marker icons
+const createCustomIcon = (color) => {
+  return L.divIcon({
+    className: 'custom-marker',
+    html: `<div style="
+      width: 20px;
+      height: 20px;
+      background-color: ${color};
+      border: 3px solid white;
+      border-radius: 50%;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+    "></div>`,
+    iconSize: [20, 20],
+    iconAnchor: [10, 10],
+    popupAnchor: [0, -10]
+  });
+};
 
-const redIcon = new L.Icon({
-  iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png',
-  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34],
-  shadowSize: [41, 41]
-});
+const blueIcon = createCustomIcon('#3b82f6');
+const redIcon = createCustomIcon('#ef4444');
 
 const MapController = ({ selectedSchool, schools }) => {
   const map = useMap();

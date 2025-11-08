@@ -247,7 +247,7 @@ const handleClepExamToggle = (exam) => {
             <select
               value={filters.clep_exam}
               onChange={(e) => handleFilterChange('clep_exam', e.target.value)}
-              className="w-full px-3 py-2 bg-white/5 border border-white/15 rounded-xl text-white placeholder-white/40 focus:ring-2 focus:ring-[#6f7dff]/60 focus:border-[#6f7dff]/80"
+              className="w-full px-3 py-2 bg-gray-800 border border-white/15 rounded-xl text-white placeholder-white/40 focus:ring-2 focus:ring-[#6f7dff]/60 focus:border-[#6f7dff]/80"
             >
               <option value="">All CLEP Exams</option>
               <option value="American Government">American Government</option>
@@ -304,7 +304,7 @@ const handleClepExamToggle = (exam) => {
           <select
             value={filters.last_updated}
             onChange={(e) => handleFilterChange('last_updated', e.target.value)}
-            className="w-full px-3 py-2 bg-white/5 border border-white/15 rounded-xl text-white focus:ring-2 focus:ring-[#6f7dff]/60 focus:border-[#6f7dff]/80"
+            className="w-full px-3 py-2 bg-gray-800 border border-white/15 rounded-xl text-white focus:ring-2 focus:ring-[#6f7dff]/60 focus:border-[#6f7dff]/80"
           >
             <option value="">Any time</option>
             <option value="1-6">1-6 months ago</option>
@@ -331,7 +331,7 @@ const handleClepExamToggle = (exam) => {
             <select
               value={filters.state}
               onChange={(e) => handleFilterChange('state', e.target.value)}
-              className="w-full px-3 py-2 bg-white/5 border border-white/15 rounded-xl text-white focus:ring-2 focus:ring-[#6f7dff]/60 focus:border-[#6f7dff]/80"
+              className="w-full px-3 py-2 bg-gray-800 border border-white/15 rounded-xl text-white focus:ring-2 focus:ring-[#6f7dff]/60 focus:border-[#6f7dff]/80"
             >
               <option value="">All States</option>
               <option value="CA">California</option>
@@ -491,7 +491,7 @@ const handleClepExamToggle = (exam) => {
         <select
           value={selectedSchool}
           onChange={(e) => setSelectedSchool(e.target.value)}
-          className="w-full px-4 py-3 bg-white/5 border border-white/15 rounded-2xl text-white focus:ring-2 focus:ring-[#6f7dff]/60 focus:border-[#6f7dff]/80 text-base"
+          className="w-full px-4 py-3 bg-gray-800 border border-white/15 rounded-2xl text-white focus:ring-2 focus:ring-[#6f7dff]/60 focus:border-[#6f7dff]/80 text-base"
           disabled={loading}
         >
           <option value="">
