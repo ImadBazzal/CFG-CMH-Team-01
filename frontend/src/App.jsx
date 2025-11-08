@@ -5,6 +5,7 @@ import ResultsPage from './pages/ResultsPage'
 import RegistarPage from './pages/RegistarPage'
 import AdminPage from './pages/AdminPage'
 import Navbar from './components/Navbar'
+import AISummaryPage from './pages/AISummaryPage'
 
 const App = () => {
   return (
@@ -15,6 +16,7 @@ const App = () => {
         <Route path="/results" element={<ResultsPage />} />
         <Route path="/registrar" element={<RegistarPage />} />
         <Route path="/admin" element={<AdminPage />} />
+        <Route path="/summary" element={<AISummaryPage />} />
       </Routes>
     </div>
   )

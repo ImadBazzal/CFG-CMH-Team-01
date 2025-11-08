@@ -24,11 +24,12 @@ const Navbar = () => {
             Admin Login
           </Link>
           
-          <button
-            className="rounded-full bg-slate-900 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-800"
+          <Link
+            to="/summary"
+            className="rounded-full bg-gradient-to-r from-[#6f7dff] to-[#f97bff] px-4 py-2 text-sm font-semibold text-white shadow-[0_10px_25px_rgba(111,125,255,0.35)] transition hover:-translate-y-0.5"
           >
-            AI Chatbot
-          </button>
+            AI Summary
+          </Link>
         </div>
       </nav>
     </header>
