@@ -42,7 +42,8 @@ const prompts = [
     description:
       'If you\'re not the designated contact, please sign in with your institutional account or request access from your registrar\'s office.',
     badge: 'Access verified',
-    hints: ['Institutional access', 'Registrar approval']
+    hints: ['Institutional access', 'Registrar approval'],
+    inputType: 'yesno'
   },
   {
     theme: 'Data Accuracy',
@@ -51,7 +52,8 @@ const prompts = [
     description:
       'Regular updates help students see the most accurate credit transfer information and reduce outdated listings.',
     badge: 'Last update: 3 months ago',
-    hints: ['Policy review', 'Last update log']
+    hints: ['Policy review', 'Last update log'],
+    inputType: 'date'
   },
   {
     theme: 'Coverage',
@@ -60,7 +62,8 @@ const prompts = [
     description:
       'List or confirm your institution\'s accepted CLEP exams and corresponding credit policies for each department.',
     badge: '26 exams accepted',
-    hints: ['Credit chart', 'Department sync']
+    hints: ['Credit chart', 'Department sync'],
+    inputType: 'multiselect'
   },
   {
     theme: 'Verification',
@@ -69,7 +72,8 @@ const prompts = [
     description:
       'Ensure each college or branch campus within your university system has signed off on its CLEP acceptance data.',
     badge: '2 departments pending',
-    hints: ['Cross-campus', 'Sign-off needed']
+    hints: ['Cross-campus', 'Sign-off needed'],
+    inputType: 'yesno'
   },
   {
     theme: 'Contact Information',
@@ -78,7 +82,8 @@ const prompts = [
     description:
       'Provide the best contact point for CLEP-related inquiries to ensure accurate information reaches students.',
     badge: 'Contact updated',
-    hints: ['Registrar email', 'Phone support']
+    hints: ['Registrar email', 'Phone support'],
+    inputType: 'contact'
   },
   {
     theme: 'Credit Details',
@@ -87,7 +92,8 @@ const prompts = [
     description:
       'Specify credit hour values to help students understand the academic value of each exam they complete.',
     badge: '3-6 credits per exam',
-    hints: ['Credit hours', 'Course equivalencies']
+    hints: ['Credit hours', 'Course equivalencies'],
+    inputType: 'range'
   },
   {
     theme: 'Update & Review',
@@ -96,11 +102,12 @@ const prompts = [
     description:
       'Make changes to your CLEP policies, add new exam acceptances, or update existing score requirements.',
     badge: 'Ready to edit',
-    hints: ['Add exams', 'Update scores']
+    hints: ['Add exams', 'Update scores'],
+    inputType: 'action'
   }
 ]
 
-const RegistrarPage = () => {
+const RegistarPage = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [email, setEmail] = useState('')
   const [currentPrompt, setCurrentPrompt] = useState(0)
@@ -110,7 +117,18 @@ const RegistrarPage = () => {
   const [showEmailNotifications, setShowEmailNotifications] = useState(false)
   const fileInputRef = useRef(null)
   
-  // email notification settings
+  // Question responses
+  const [questionResponses, setQuestionResponses] = useState({
+    0: null, // yes/no
+    1: '', // date
+    2: [], // multiselect exams
+    3: null, // yes/no
+    4: { name: '', email: '', phone: '' }, // contact
+    5: { min: 3, max: 6 }, // range
+    6: null // action
+  })
+  
+  // Email notification settings
   const [emailSettings, setEmailSettings] = useState({
     notifyOnChanges: true,
     notifyDepartments: true,
@@ -178,16 +196,13 @@ const RegistrarPage = () => {
   const handleAddPolicy = () => {
     if (formData.exam && formData.courseEquivalent && formData.department) {
       if (editingIndex !== null) {
-        // update existing
         const updated = [...clepPolicies]
         updated[editingIndex] = formData
         setClepPolicies(updated)
         setEditingIndex(null)
       } else {
-        // add new
         setClepPolicies([...clepPolicies, formData])
       }
-      // reset form
       setFormData({
         exam: '',
         minScore: 50,
@@ -218,7 +233,7 @@ const RegistrarPage = () => {
     setEditingIndex(null)
   }
 
-  // bulk import functionality
+  // Bulk import functionality
   const handleFileUpload = (e) => {
     const file = e.target.files[0]
     if (file) {
@@ -226,7 +241,7 @@ const RegistrarPage = () => {
       reader.onload = (event) => {
         try {
           const text = event.target.result
-          const rows = text.split('\n').slice(1) // skip header row
+          const rows = text.split('\n').slice(1)
           const importedPolicies = []
           
           rows.forEach(row => {
@@ -255,7 +270,6 @@ const RegistrarPage = () => {
     }
   }
 
-  // download template
   const downloadTemplate = () => {
     const csvContent = 'Exam Name,Minimum Score,Credit Hours,Course Equivalent,Department\n' +
       'American Government,50,3,POLS 101,Political Science\n' +
@@ -270,7 +284,6 @@ const RegistrarPage = () => {
     window.URL.revokeObjectURL(url)
   }
 
-  // export current policies
   const exportPolicies = () => {
     let csvContent = 'Exam Name,Minimum Score,Credit Hours,Course Equivalent,Department\n'
     clepPolicies.forEach(policy => {
@@ -287,7 +300,6 @@ const RegistrarPage = () => {
   }
 
   const handleSaveAll = () => {
-    // mock save functionality with email notification
     if (emailSettings.notifyOnChanges) {
       const recipients = []
       if (emailSettings.notifyDepartments) {
@@ -312,6 +324,316 @@ const RegistrarPage = () => {
   const saveEmailSettings = () => {
     alert('Email notification preferences saved!')
     setShowEmailNotifications(false)
+  }
+
+  // Render question-specific input
+  const renderQuestionInput = () => {
+    const prompt = activePrompt
+    
+    switch (prompt.inputType) {
+      case 'yesno':
+        return (
+          <div className="mt-8 flex gap-4">
+            <button
+              onClick={() => {
+                setQuestionResponses({...questionResponses, [currentPrompt]: true})
+                setTimeout(advancePrompt, 300)
+              }}
+              className={`flex-1 rounded-2xl border px-6 py-4 text-center font-semibold transition ${
+                questionResponses[currentPrompt] === true
+                  ? 'border-green-400/50 bg-green-400/20 text-green-100'
+                  : 'border-white/10 bg-white/5 text-white/80 hover:bg-white/10'
+              }`}
+            >
+              Yes
+            </button>
+            <button
+              onClick={() => {
+                setQuestionResponses({...questionResponses, [currentPrompt]: false})
+                setTimeout(advancePrompt, 300)
+              }}
+              className={`flex-1 rounded-2xl border px-6 py-4 text-center font-semibold transition ${
+                questionResponses[currentPrompt] === false
+                  ? 'border-red-400/50 bg-red-400/20 text-red-100'
+                  : 'border-white/10 bg-white/5 text-white/80 hover:bg-white/10'
+              }`}
+            >
+              No
+            </button>
+          </div>
+        )
+      
+      case 'date':
+        return (
+          <div className="mt-8">
+            <label className="block text-sm font-semibold text-white/80 mb-3">
+              Last Review Date
+            </label>
+            <input
+              type="date"
+              value={questionResponses[currentPrompt]}
+              onChange={(e) => setQuestionResponses({...questionResponses, [currentPrompt]: e.target.value})}
+              className="w-full rounded-2xl border border-white/10 bg-white/5 px-5 py-3.5 text-base text-white focus:border-white/30 focus:bg-white/10 focus:outline-none"
+            />
+          </div>
+        )
+      
+      case 'multiselect':
+        return (
+          <div className="mt-8">
+            <label className="block text-sm font-semibold text-white/80 mb-3">
+              Select Accepted CLEP Exams
+            </label>
+            <div className="rounded-2xl border border-white/10 bg-white/5 p-4 max-h-64 overflow-y-auto">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                {clepExams.slice(0, 10).map(exam => (
+                  <label key={exam} className="flex items-center gap-3 p-2 rounded-lg hover:bg-white/5 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={questionResponses[currentPrompt]?.includes(exam)}
+                      onChange={(e) => {
+                        const current = questionResponses[currentPrompt] || []
+                        const updated = e.target.checked
+                          ? [...current, exam]
+                          : current.filter(x => x !== exam)
+                        setQuestionResponses({...questionResponses, [currentPrompt]: updated})
+                      }}
+                      className="w-4 h-4 rounded border-white/20 bg-white/5 text-blue-500 focus:ring-2 focus:ring-blue-500/50"
+                    />
+                    <span className="text-sm text-white/80">{exam}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+            <p className="text-xs text-white/50 mt-2">
+              Selected: {questionResponses[currentPrompt]?.length || 0} exams
+            </p>
+          </div>
+        )
+      
+      case 'contact':
+        return (
+          <div className="mt-8 space-y-4">
+            <div>
+              <label className="block text-sm font-semibold text-white/80 mb-2">
+                Contact Name
+              </label>
+              <input
+                type="text"
+                value={questionResponses[currentPrompt]?.name || ''}
+                onChange={(e) => setQuestionResponses({
+                  ...questionResponses,
+                  [currentPrompt]: {...questionResponses[currentPrompt], name: e.target.value}
+                })}
+                placeholder="Dr. Jane Smith"
+                className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white placeholder-white/40 focus:border-white/30 focus:bg-white/10 focus:outline-none"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-semibold text-white/80 mb-2">
+                Email Address
+              </label>
+              <input
+                type="email"
+                value={questionResponses[currentPrompt]?.email || ''}
+                onChange={(e) => setQuestionResponses({
+                  ...questionResponses,
+                  [currentPrompt]: {...questionResponses[currentPrompt], email: e.target.value}
+                })}
+                placeholder="registrar@university.edu"
+                className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white placeholder-white/40 focus:border-white/30 focus:bg-white/10 focus:outline-none"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-semibold text-white/80 mb-2">
+                Phone Number
+              </label>
+              <input
+                type="tel"
+                value={questionResponses[currentPrompt]?.phone || ''}
+                onChange={(e) => setQuestionResponses({
+                  ...questionResponses,
+                  [currentPrompt]: {...questionResponses[currentPrompt], phone: e.target.value}
+                })}
+                placeholder="(555) 123-4567"
+                className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white placeholder-white/40 focus:border-white/30 focus:bg-white/10 focus:outline-none"
+              />
+            </div>
+          </div>
+        )
+      
+      case 'range':
+  return (
+    <div className="mt-8 space-y-6">
+      <div>
+        <label className="block text-sm font-semibold text-white/80 mb-3">
+          Minimum Credit Hours: {questionResponses[currentPrompt]?.min || 3}
+        </label>
+        <div className="relative">
+          <input
+            type="range"
+            min="1"
+            max="12"
+            value={questionResponses[currentPrompt]?.min || 3}
+            onChange={(e) => setQuestionResponses({
+              ...questionResponses,
+              [currentPrompt]: {...questionResponses[currentPrompt], min: parseInt(e.target.value)}
+            })}
+            className="w-full h-2 bg-white/10 rounded-lg appearance-none cursor-pointer slider"
+          />
+          <style jsx>{`
+            .slider::-webkit-slider-thumb {
+              appearance: none;
+              width: 20px;
+              height: 20px;
+              border-radius: 50%;
+              background: linear-gradient(to right, #6f7dff, #5ecfff);
+              cursor: pointer;
+              border: 3px solid white;
+              box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+            }
+            .slider::-moz-range-thumb {
+              width: 20px;
+              height: 20px;
+              border-radius: 50%;
+              background: linear-gradient(to right, #6f7dff, #5ecfff);
+              cursor: pointer;
+              border: 3px solid white;
+              box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+            }
+            .slider::-webkit-slider-runnable-track {
+              width: 100%;
+              height: 8px;
+              background: linear-gradient(
+                to right,
+                #6f7dff 0%,
+                #5ecfff ${((questionResponses[currentPrompt]?.min || 3) - 1) / 11 * 100}%,
+                rgba(255, 255, 255, 0.1) ${((questionResponses[currentPrompt]?.min || 3) - 1) / 11 * 100}%
+              );
+              border-radius: 4px;
+            }
+            .slider::-moz-range-track {
+              width: 100%;
+              height: 8px;
+              background: rgba(255, 255, 255, 0.1);
+              border-radius: 4px;
+            }
+            .slider::-moz-range-progress {
+              height: 8px;
+              background: linear-gradient(to right, #6f7dff, #5ecfff);
+              border-radius: 4px;
+            }
+          `}</style>
+        </div>
+      </div>
+      <div>
+        <label className="block text-sm font-semibold text-white/80 mb-3">
+          Maximum Credit Hours: {questionResponses[currentPrompt]?.max || 6}
+        </label>
+        <div className="relative">
+          <input
+            type="range"
+            min="1"
+            max="12"
+            value={questionResponses[currentPrompt]?.max || 6}
+            onChange={(e) => setQuestionResponses({
+              ...questionResponses,
+              [currentPrompt]: {...questionResponses[currentPrompt], max: parseInt(e.target.value)}
+            })}
+            className="w-full h-2 bg-white/10 rounded-lg appearance-none cursor-pointer slider-max"
+          />
+          <style jsx>{`
+            .slider-max::-webkit-slider-thumb {
+              appearance: none;
+              width: 20px;
+              height: 20px;
+              border-radius: 50%;
+              background: linear-gradient(to right, #6f7dff, #5ecfff);
+              cursor: pointer;
+              border: 3px solid white;
+              box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+            }
+            .slider-max::-moz-range-thumb {
+              width: 20px;
+              height: 20px;
+              border-radius: 50%;
+              background: linear-gradient(to right, #6f7dff, #5ecfff);
+              cursor: pointer;
+              border: 3px solid white;
+              box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+            }
+            .slider-max::-webkit-slider-runnable-track {
+              width: 100%;
+              height: 8px;
+              background: linear-gradient(
+                to right,
+                #6f7dff 0%,
+                #5ecfff ${((questionResponses[currentPrompt]?.max || 6) - 1) / 11 * 100}%,
+                rgba(255, 255, 255, 0.1) ${((questionResponses[currentPrompt]?.max || 6) - 1) / 11 * 100}%
+              );
+              border-radius: 4px;
+            }
+            .slider-max::-moz-range-track {
+              width: 100%;
+              height: 8px;
+              background: rgba(255, 255, 255, 0.1);
+              border-radius: 4px;
+            }
+            .slider-max::-moz-range-progress {
+              height: 8px;
+              background: linear-gradient(to right, #6f7dff, #5ecfff);
+              border-radius: 4px;
+            }
+          `}</style>
+        </div>
+      </div>
+      <div className="rounded-xl border border-blue-200/30 bg-blue-300/10 p-4">
+        <p className="text-sm text-blue-50/80">
+          Typical range: {questionResponses[currentPrompt]?.min || 3} - {questionResponses[currentPrompt]?.max || 6} credit hours per exam
+        </p>
+      </div>
+    </div>
+  )
+      
+      case 'action':
+        return (
+          <div className="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <button
+              onClick={() => {
+                setQuestionResponses({...questionResponses, [currentPrompt]: 'add'})
+                setTimeout(() => setShowDataEntry(true), 300)
+              }}
+              className="rounded-2xl border border-white/10 bg-white/5 px-6 py-6 text-center font-semibold text-white/80 transition hover:bg-white/10 hover:border-white/20"
+            >
+              <Plus className="w-8 h-8 mx-auto mb-2" />
+              Add New Policies
+            </button>
+            <button
+              onClick={() => {
+                setQuestionResponses({...questionResponses, [currentPrompt]: 'update'})
+                setTimeout(() => setShowDataEntry(true), 300)
+              }}
+              className="rounded-2xl border border-white/10 bg-white/5 px-6 py-6 text-center font-semibold text-white/80 transition hover:bg-white/10 hover:border-white/20"
+            >
+              <Edit2 className="w-8 h-8 mx-auto mb-2" />
+              Update Existing
+            </button>
+            <button
+              onClick={() => {
+                setQuestionResponses({...questionResponses, [currentPrompt]: 'review'})
+                setTimeout(() => setShowDataEntry(true), 300)
+              }}
+              className="rounded-2xl border border-white/10 bg-white/5 px-6 py-6 text-center font-semibold text-white/80 transition hover:bg-white/10 hover:border-white/20"
+            >
+              <Check className="w-8 h-8 mx-auto mb-2" />
+              Review All
+            </button>
+          </div>
+        )
+      
+      default:
+        return null
+    }
   }
 
   // login Screen
@@ -367,7 +689,7 @@ const RegistrarPage = () => {
     )
   }
 
-  // bulk Import Modal
+  // Bulk Import Modal
   if (showBulkImport) {
     return (
       <main className="relative flex min-h-screen w-full items-center justify-center overflow-hidden bg-[radial-gradient(circle_at_15%_20%,rgba(71,134,255,0.25),transparent_45%),radial-gradient(circle_at_80%_10%,rgba(255,86,180,0.25),transparent_40%),linear-gradient(135deg,#030712,#020310_55%,#050917)] px-4 py-10 sm:px-6 lg:px-12">
@@ -389,7 +711,7 @@ const RegistrarPage = () => {
           </header>
 
           <div className="space-y-6">
-            {/* instructions */}
+            {/* Instructions */}
             <div className="rounded-2xl border border-white/10 bg-white/5 p-6">
               <h2 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
                 <FileText className="w-5 h-5" />
@@ -404,7 +726,7 @@ const RegistrarPage = () => {
               </ul>
             </div>
 
-            {/* download template */}
+            {/* Download Template */}
             <button
               onClick={downloadTemplate}
               className="w-full flex items-center justify-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-6 py-4 text-white/80 transition hover:bg-white/10"
@@ -413,7 +735,7 @@ const RegistrarPage = () => {
               <span className="font-semibold">Download CSV Template</span>
             </button>
 
-            {/* upload area */}
+            {/* Upload Area */}
             <div className="rounded-2xl border-2 border-dashed border-white/20 bg-white/5 p-8 text-center">
               <input
                 ref={fileInputRef}
@@ -435,7 +757,7 @@ const RegistrarPage = () => {
             </div>
           </div>
 
-          {/* action buttons */}
+          {/* Action Buttons */}
           <div className="flex justify-end gap-3 mt-8">
             <button
               onClick={() => setShowBulkImport(false)}
@@ -449,7 +771,7 @@ const RegistrarPage = () => {
     )
   }
 
-  // email notifications modal
+  // Email Notifications Modal
   if (showEmailNotifications) {
     return (
       <main className="relative flex min-h-screen w-full items-center justify-center overflow-hidden bg-[radial-gradient(circle_at_15%_20%,rgba(71,134,255,0.25),transparent_45%),radial-gradient(circle_at_80%_10%,rgba(255,86,180,0.25),transparent_40%),linear-gradient(135deg,#030712,#020310_55%,#050917)] px-4 py-10 sm:px-6 lg:px-12">
@@ -471,7 +793,7 @@ const RegistrarPage = () => {
           </header>
 
           <div className="space-y-6">
-            {/* toggle options */}
+            {/* Toggle Options */}
             <div className="rounded-2xl border border-white/10 bg-white/5 p-6 space-y-4">
               <div className="flex items-center justify-between">
                 <div>
@@ -513,7 +835,7 @@ const RegistrarPage = () => {
               </div>
             </div>
 
-            {/* email lists */}
+            {/* Email Lists */}
             {emailSettings.notifyDepartments && (
               <div>
                 <label className="block text-sm font-semibold text-white/80 mb-3">
@@ -543,7 +865,7 @@ const RegistrarPage = () => {
               />
             </div>
 
-            {/* preview */}
+            {/* Preview */}
             <div className="rounded-2xl border border-blue-200/30 bg-blue-300/10 p-6">
               <h3 className="font-semibold text-white mb-3 flex items-center gap-2">
                 <Mail className="w-5 h-5" />
@@ -562,7 +884,7 @@ const RegistrarPage = () => {
             </div>
           </div>
 
-          {/* action buttons */}
+          {/* Action Buttons */}
           <div className="flex justify-end gap-3 mt-8">
             <button
               onClick={() => setShowEmailNotifications(false)}
@@ -604,7 +926,7 @@ const RegistrarPage = () => {
               </p>
             </div>
             
-            {/* quick action buttons */}
+            {/* Quick Action Buttons */}
             <div className="flex gap-3">
               <button
                 onClick={() => setShowBulkImport(true)}
@@ -852,6 +1174,9 @@ const RegistrarPage = () => {
           </div>
         </section>
 
+        {/* Question-specific input */}
+        {renderQuestionInput()}
+
         <div className="mt-10 flex flex-wrap items-center gap-4">
           <div className="flex flex-1 gap-2">
             {prompts.map((_, index) => {
@@ -875,25 +1200,28 @@ const RegistrarPage = () => {
           </p>
         </div>
 
-        <div className="mt-10 flex flex-wrap justify-end gap-3">
-          <button
-            type="button"
-            className="w-full rounded-full bg-white/10 px-6 py-3 text-sm font-semibold text-white/80 transition hover:bg-white/20 sm:w-auto"
-            onClick={advancePrompt}
-          >
-            {currentPrompt === prompts.length - 1 ? 'Skip for now' : 'Remind me later'}
-          </button>
-          <button
-            type="button"
-            className="w-full rounded-full bg-gradient-to-r from-[#6f7dff] to-[#5ecfff] px-6 py-3 text-sm font-semibold text-[#020308] shadow-[0_12px_25px_rgba(94,207,255,0.25)] transition hover:-translate-y-0.5 hover:shadow-[0_18px_35px_rgba(94,207,255,0.35)] sm:w-auto"
-            onClick={advancePrompt}
-          >
-            {currentPrompt === prompts.length - 1 ? 'Update Policies' : 'Next question'}
-          </button>
-        </div>
+        {/* Navigation buttons - only show for non-action questions */}
+        {activePrompt.inputType !== 'action' && activePrompt.inputType !== 'yesno' && (
+          <div className="mt-10 flex flex-wrap justify-end gap-3">
+            <button
+              type="button"
+              className="w-full rounded-full bg-white/10 px-6 py-3 text-sm font-semibold text-white/80 transition hover:bg-white/20 sm:w-auto"
+              onClick={advancePrompt}
+            >
+              Skip
+            </button>
+            <button
+              type="button"
+              className="w-full rounded-full bg-gradient-to-r from-[#6f7dff] to-[#5ecfff] px-6 py-3 text-sm font-semibold text-[#020308] shadow-[0_12px_25px_rgba(94,207,255,0.25)] transition hover:-translate-y-0.5 hover:shadow-[0_18px_35px_rgba(94,207,255,0.35)] sm:w-auto"
+              onClick={advancePrompt}
+            >
+              Continue
+            </button>
+          </div>
+        )}
       </section>
     </main>
   )
 }
 
-export default RegistrarPage
+export default RegistarPage
