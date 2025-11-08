@@ -1,5 +1,5 @@
 import React from 'react'
-import { Link, NavLink } from 'react-router'
+import { Link, NavLink } from 'react-router-dom' // ✅ correct import
 import modernStatesLogo from '../assets/modern-states.png-removebg-preview.png'
 
 const Navbar = () => {
@@ -16,7 +16,7 @@ const Navbar = () => {
             Modern States
           </span>
         </Link>
-        
+
         <div className="flex items-center gap-3">
           <Link
             to="/registrar"
@@ -25,7 +25,7 @@ const Navbar = () => {
             <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-500"></span>
             <span className="relative">Institution Login</span>
           </Link>
-          
+
           <Link
             to="/admin"
             className="group relative rounded-full bg-slate-900 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-all duration-300 hover:bg-slate-800 hover:-translate-y-0.5 hover:shadow-lg overflow-hidden"
@@ -33,7 +33,18 @@ const Navbar = () => {
             <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-500"></span>
             <span className="relative">Admin Login</span>
           </Link>
-          
+
+          {/* ✅ Fixed external link */}
+          <a
+            href="https://modernstates.org/?form=FUNFTMPVEVX"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group relative rounded-full bg-slate-900 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-all duration-300 hover:bg-slate-800 hover:-translate-y-0.5 hover:shadow-lg overflow-hidden"
+          >
+            <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-500"></span>
+            <span className="relative">Support Us</span>
+          </a>
+
           <Link
             to="/summary"
             className="group relative rounded-full bg-gradient-to-r from-[#6f7dff] to-[#f97bff] px-4 py-2 text-sm font-semibold text-white shadow-[0_10px_25px_rgba(111,125,255,0.35)] transition-all duration-300 hover:-translate-y-1 hover:scale-105 hover:shadow-[0_15px_35px_rgba(111,125,255,0.5)] overflow-hidden"
