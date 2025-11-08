@@ -227,7 +227,7 @@ const handleClepExamToggle = (exam) => {
         {/* CLEP exam */}
         <div>
           <label className="block text-sm font-medium text-white/80 mb-2">CLEP Exam Type (select all that apply)</label>
-          <div className="border border-white/10 rounded-xl max-h-48 overflow-y-auto p-3 space-y-2 bg-white/5">
+          <div className="border border-white/10 rounded-xl max-h-32 overflow-y-auto p-3 space-y-2 bg-white/5">
             {[
               'American Government',
               'American Literature',
