@@ -1,18 +1,53 @@
 import React, { useState, useEffect } from 'react';
 import { MapPin, Filter } from 'lucide-react';
+import mapboxgl from 'mapbox-gl';
+import 'mapbox-gl/dist/mapbox-gl.css';
+
+mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN;
 
 const ResultsPage = () => {
-  const [selectedSchool, setSelectedSchool] = useState('');
-  const [schools, setSchools] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [filters, setFilters] = useState({
-    clep_exam: '',
-    city: '',
-    state: '',
-    maxCredits: '',
-    maxTranscriptionFee: ''
-  });
+
+  // MAPBOX INTEGRATION
+
+  const mapContainerRef = React.createRef(null);
+  const mapRef = React.useRef(null);
+
+  useEffect(() => {
+    if (mapRef.current) return; // initialize map only once
+    mapRef.current = new mapboxgl.Map({
+      container: mapContainerRef.current,
+      style: 'mapbox://styles/mapbox/streets-v11',
+      center: [-95, 37],
+      zoom: 3,
+    });
+  }, []);
+
+  useEffect(() => {
+    if (!mapRef.current) return;
+    document.querySelectorAll('.mapboxgl-marker').forEach((marker) => marker.remove());
+    schools.forEach((school) => {
+      if (!school.lat || !school.lng) return;
+      const popup = new mapboxgl.Popup({ offset: 25 }).setHTML(
+        `<strong>${school.name}</strong><br>${school.city}, ${school.state}`
+      );
+      new mapboxgl.Marker({color: '#FF5722'})
+      .setLngLat([school.lng, school.lat])
+        .setPopup(popup)
+        .addTo(mapRef.current);
+    }); 
+  }, [schools]);
+
+    const [selectedSchool, setSelectedSchool] = useState('');
+    const [schools, setSchools] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const [filters, setFilters] = useState({
+      clep_exam: '',
+      city: '',
+      state: '',
+      maxCredits: '',
+      maxTranscriptionFee: ''
+    });
 
   // fetch schools from backend
   useEffect(() => {
@@ -80,55 +115,9 @@ const ResultsPage = () => {
   // UI
   return (
     <div className="relative w-screen h-screen overflow-hidden">
-      {/* MAP BACKGROUND */}
-      <div className="absolute inset-0 bg-gray-900">
-        <div className="w-full h-full flex items-center justify-center relative">
-          {/* subtle grid overlay */}
-          <div className="absolute inset-0 opacity-10">
-            <div className="grid grid-cols-12 grid-rows-8 h-full w-full">
-              {[...Array(96)].map((_, i) => (
-                <div key={i} className="border border-gray-700"></div>
-              ))}
-            </div>
-          </div>
-
-          {/* map placeholder center text */}
-          <div className="relative z-10 text-center">
-            <MapPin className="w-16 h-16 text-gray-600 mx-auto mb-4" />
-            <p className="text-gray-400 text-lg font-medium">
-              {loading ? 'Loading CLEP Institutions...' : 'Interactive Map'}
-            </p>
-            <p className="text-gray-500 text-sm mt-2">
-              {schools.length
-                ? `${schools.length} schools found`
-                : loading
-                ? 'Fetching data from registrar directory...'
-                : 'No results — adjust filters'}
-            </p>
-          </div>
-
-          {/* dynamic map markers */}
-          {schools.slice(0, 20).map((school, index) => (
-            <div
-              key={school.id}
-              className="absolute w-6 h-6 bg-blue-600 rounded-full border-4 border-white shadow-lg cursor-pointer hover:bg-blue-700"
-              style={{
-                top: `${20 + (index * 11) % 60}%`,
-                left: `${25 + (index * 7) % 50}%`,
-              }}
-              title={school.name}
-              onClick={() => setSelectedSchool(school.id)}
-            />
-          ))}
-
-          {/* legend */}
-          <div className="absolute bottom-4 left-4 bg-white rounded-lg shadow-lg px-4 py-3 z-20">
-            <div className="flex items-center gap-2 text-sm">
-              <div className="w-3 h-3 bg-blue-600 rounded-full"></div>
-              <span className="text-gray-700 font-medium">Accepts CLEP Credit</span>
-            </div>
-          </div>
-        </div>
+      {/* MAP CONTAINER */}
+      <div className="absolute inset-0">
+        <div ref={mapContainerRef} className ="w-full h-full" />
       </div>
 
       {/* FILTER SIDEBAR */}

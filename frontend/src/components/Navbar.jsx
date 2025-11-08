@@ -1,5 +1,5 @@
 import React from 'react'
-import { Link } from 'react-router'
+import { Link } from 'react-router-dom'
 
 const Navbar = () => {
   return (
@@ -10,9 +10,7 @@ const Navbar = () => {
           <div className="flex-shrink-0">
             <h1 className="text-2xl font-bold text-black">Modern States</h1>
           </div>
-
-          {/* Admin and registar login buttons */}
-          <div className="flex space-x-4">
+            <div> 
             <Link
               to="/admin"
               className="btn btn-primary px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors duration-200 font-medium"
