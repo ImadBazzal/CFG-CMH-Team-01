@@ -29,8 +29,8 @@ const ResultsPage = () => {
       if (filters.city) params.append('city', filters.city);
       if (filters.state) params.append('state', filters.state);
       
-      // Placeholder for backend url
-      const response = await fetch(`http://localhost:8000/tests/search?${params}`);
+      // Use correct backend API endpoint
+      const response = await fetch(`http://localhost:8000/api/tests/search?${params}`);
       
       if (!response.ok) {
         throw new Error('Failed to fetch schools');
@@ -39,21 +39,16 @@ const ResultsPage = () => {
       const result = await response.json();
       
       // Transform backend data to match frontend structure
-      // Based on your Institutions table structure
-      const transformedSchools = result.data.map((institution) => ({
-        id: institution['MSEA Org ID'],
-        name: institution.Name,
-        city: institution.City,
-        state: institution.State,
-        zip: institution.Zip,
-        location: `${institution.City}, ${institution.State}`,
-        enrollment: institution.Enrollment,
-        maxCredits: institution['Max Credits'],
-        transcriptionFee: institution['Transcription Fee'],
-        canUseForFailedCourses: institution['Can Use For Failed Courses'],
-        canEnrolledStudentsUseCLEP: institution['Can Enrolled Students Use CLEP'],
-        scoreValidity: institution['Score Validity (years)'],
-        clepWebUrl: institution['CLEP Web URL']
+      // Based on MS Sample SMALL table structure
+      const transformedSchools = result.data.map((school, index) => ({
+        id: school.id || index + 1,
+        name: school['School Name'] || 'Unknown School',
+        city: school.City || 'Unknown',
+        state: school.State || 'Unknown',
+        location: `${school.City || 'Unknown'}, ${school.State || 'Unknown'}`,
+        humanities: school.Humanities,
+        americanGovernment: school['American Government'],
+        diCode: school['DI Code']
       }));
       
       // Apply frontend filters
@@ -352,56 +347,22 @@ const ResultsPage = () => {
                         </div>
                         
                         <div className="flex justify-between">
-                          <span className="text-gray-600">Enrollment:</span>
-                          <span className="text-gray-900 font-medium">{school.enrollment?.toLocaleString() || 'N/A'}</span>
+                          <span className="text-gray-600">DI Code:</span>
+                          <span className="text-gray-900 font-medium">{school.diCode || 'N/A'}</span>
                         </div>
                         
                         <div className="flex justify-between">
-                          <span className="text-gray-600">Max CLEP Credits:</span>
-                          <span className="text-gray-900 font-medium">{school.maxCredits || 'N/A'}</span>
+                          <span className="text-gray-600">Humanities Score:</span>
+                          <span className="text-gray-900 font-medium">{school.humanities !== 'NULL' ? school.humanities : 'N/A'}</span>
                         </div>
                         
                         <div className="flex justify-between">
-                          <span className="text-gray-600">Transcription Fee:</span>
-                          <span className="text-gray-900 font-medium">${school.transcriptionFee || 'N/A'}</span>
-                        </div>
-                        
-                        <div className="flex justify-between">
-                          <span className="text-gray-600">Score Valid For:</span>
-                          <span className="text-gray-900 font-medium">{school.scoreValidity || 'N/A'} years</span>
-                        </div>
-                        
-                        <div className="flex justify-between items-center">
-                          <span className="text-gray-600">Enrolled Students Can Use:</span>
-                          <span className={`px-2 py-1 rounded text-xs font-medium ${
-                            school.canEnrolledStudentsUseCLEP ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                          }`}>
-                            {school.canEnrolledStudentsUseCLEP ? 'Yes' : 'No'}
-                          </span>
-                        </div>
-                        
-                        <div className="flex justify-between items-center">
-                          <span className="text-gray-600">Use for Failed Courses:</span>
-                          <span className={`px-2 py-1 rounded text-xs font-medium ${
-                            school.canUseForFailedCourses ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                          }`}>
-                            {school.canUseForFailedCourses ? 'Yes' : 'No'}
-                          </span>
+                          <span className="text-gray-600">American Government Score:</span>
+                          <span className="text-gray-900 font-medium">{school.americanGovernment !== 'NULL' ? school.americanGovernment : 'N/A'}</span>
                         </div>
                       </div>
                       
-                      {school.clepWebUrl && (
-                        <div className="mt-4 pt-3 border-t border-gray-200">
-                          <a 
-                            href={school.clepWebUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-blue-600 hover:text-blue-800 text-sm font-medium"
-                          >
-                            View CLEP Policy →
-                          </a>
-                        </div>
-                      )}
+
                     </>
                   ) : null;
                 })()}
