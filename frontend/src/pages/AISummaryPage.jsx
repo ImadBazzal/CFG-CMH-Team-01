@@ -1,10 +1,27 @@
 import React, { useState } from 'react'
 
-const FAKE_SUMMARY = `
-You reported a score of 50 on the CLEP Biology exam. That places you in the same score band as students who typically receive 6 science credits at Metropolitan State, Northbridge University, and the MSU satellite campuses within 40 miles. 
+const MOCK_SUMMARIES = [
+  `
+  You reported a score of 50 on the CLEP Biology exam. That places you in the same score band as students who typically receive 6 science credits at Metropolitan State, Northbridge University, and the MSU satellite campuses within 40 miles.
 
-Those institutions also award elective credit for related exams with comparable rigor—Calculus (min 50), Natural Sciences (min 50), and Human Growth & Development (min 52). If you’re targeting Biology credit, Modern States suggests pairing Biology with one of those adjacent exams to maximize transferable hours at the schools above.
-`.trim()
+  Those institutions also award elective credit for related exams with comparable rigor—Calculus (min 50), Natural Sciences (min 50), and Human Growth & Development (min 52). If you’re targeting Biology credit, Modern States suggests pairing Biology with one of those adjacent exams to maximize transferable hours at the schools above.
+  `,
+  `
+  With a 58 on CLEP American Government, you qualify for 3 political science credits at Brighton College and Lakeside State, and both schools apply the credit toward their Civics core. The registrar cohort also flagged History of the US I (min 56) and Intro to Sociology (min 53) as “momentum exams” that map to the same general-ed block, so stacking those can unlock up to 9 total humanities credits at the same institutions.
+  `,
+  `
+  Scoring 63 on College Algebra mirrors the median of students who place directly into Calculus I at Riverbend University. Their registrar crosswalk shows nearby campuses (North Hills CC and Capital Metro) translating that score into 4 math credits plus an optional placement waiver. They recommend pairing your Algebra result with CLEP Precalculus (min 55) to secure a full year of math equivalency before transferring.
+  `,
+  `
+  Your 53 in CLEP Spanish places you in the top 30% of language submissions to Westbrook College. They automatically grant 6 lower-division credits and note that the same proficiency opens “fast-track evaluation” for French/German if you test within 60 days. Advisors at three partner schools within 25 miles honor a similar policy, so you can mix-and-match language exams to fulfill the entire global studies requirement ahead of enrollment.
+  `,
+  `
+  A 56 on CLEP Information Systems earns you 3 technology credits at Center City Tech, but the school also awards an extra elective if you submit a matching Intro to Business Law score (min 55). Their data shows students who combine those two exams with Financial Accounting (min 57) arrive with nearly one semester of the business core satisfied. Campuses in the same consortium (North Loop Tech + Prairie Ridge) mirror that policy.
+  `,
+  `
+  The 61 you achieved on CLEP Natural Sciences unlocks 6 lab-science credits at Horizon University and its satellite campuses. Their advising note indicates students with that score typically pass the campus chemistry challenge exam, freeing them to tackle upper-division STEM courses earlier. If you add Human Growth & Development (min 54) and Analyzing & Interpreting Literature (min 55), Horizon will classify you as “STEM-complete” for the general education block.
+  `
+].map(summary => summary.trim())
 
 const AISummaryPage = () => {
   const [summary, setSummary] = useState('')
@@ -57,11 +74,12 @@ const AISummaryPage = () => {
             type="button"
             className="mt-8 w-full rounded-2xl bg-gradient-to-r from-[#6f7dff] via-[#7f5dff] to-[#f97bff] px-6 py-3 text-base font-semibold text-white shadow-[0_18px_35px_rgba(111,125,255,0.35)] transition-all hover:-translate-y-0.5"
             onClick={() => {
-              setSummary(FAKE_SUMMARY)
+              const randomSummary = MOCK_SUMMARIES[Math.floor(Math.random() * MOCK_SUMMARIES.length)]
+              setSummary(randomSummary)
               setHasGenerated(true)
             }}
           >
-            {hasGenerated ? 'Regenerate Summary' : 'Generate Summary'}
+            {hasGenerated ? 'Generate Another Summary' : 'Generate Summary'}
           </button>
         </div>
       </section>
