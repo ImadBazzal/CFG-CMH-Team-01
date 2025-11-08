@@ -1,4 +1,5 @@
-import React, { useMemo, useState } from 'react'
+import React, { useState, useMemo } from 'react'
+import { useNavigate } from 'react-router-dom'
 
 const DEFAULT_API_BASE_URL =
   import.meta?.env?.VITE_API_BASE_URL?.replace(/\/$/, '') ?? 'http://localhost:8000/api'
@@ -9,39 +10,41 @@ const initialFilters = {
 }
 
 const testOptions = [
-  'Algebra',
-  'Humanities',
   'American Government',
+  'American Literature',
+  'Analyzing & Interpreting Literature',
   'Biology',
+  'Calculus',
   'Chemistry',
+  'College Algebra',
   'College Composition',
-  'History of the United States',
+  'College Mathematics',
+  'English Literature',
+  'Financial Accounting',
+  'French Language',
+  'German Language',
+  'History of the United States I',
+  'History of the United States II',
+  'Human Growth and Development',
+  'Information Systems',
+  'Introductory Business Law',
+  'Introductory Psychology',
+  'Introductory Sociology',
+  'Natural Sciences',
+  'Precalculus',
+  'Principles of Macroeconomics',
+  'Principles of Microeconomics',
   'Principles of Management',
-  'Spanish',
-  'Other'
+  'Principles of Marketing',
+  'Spanish Language',
+  'Western Civilization I',
+  'Western Civilization II'
 ]
 
-const Searchbar = ({ apiBaseUrl = DEFAULT_API_BASE_URL, onResults, onError }) => {
+const Searchbar = ({ apiBaseUrl = DEFAULT_API_BASE_URL }) => {
   const [filters, setFilters] = useState(initialFilters)
-  const [results, setResults] = useState([])
-  const [loading, setLoading] = useState(false)
   const [errorMessage, setErrorMessage] = useState('')
-  const [lastQuery, setLastQuery] = useState(null)
-
-  const normalizedBaseUrl = useMemo(
-    () => (apiBaseUrl ? apiBaseUrl.replace(/\/$/, '') : DEFAULT_API_BASE_URL),
-    [apiBaseUrl]
-  )
-
-  const lastQueryDescription = useMemo(() => {
-    if (!lastQuery) return ''
-    try {
-      const url = new URL(lastQuery.endpoint)
-      return url.search || 'all tests'
-    } catch {
-      return 'your filters'
-    }
-  }, [lastQuery])
+  const navigate = useNavigate()
 
   const handleSelectChange = (event) => {
     setFilters((prev) => ({ ...prev, testType: event.target.value }))
@@ -52,52 +55,44 @@ const Searchbar = ({ apiBaseUrl = DEFAULT_API_BASE_URL, onResults, onError }) =>
   }
 
   const buildQueryString = (activeFilters) => {
-    const params = new URLSearchParams()
+  const params = new URLSearchParams()
 
-    if (activeFilters.score !== '') {
-      const parsedScore = Number(activeFilters.score)
-      if (!Number.isNaN(parsedScore)) {
-        if (activeFilters.testType === 'Humanities') {
-          params.append('min_humanities', parsedScore)
-        } else if (activeFilters.testType === 'American Government') {
-          params.append('min_american_government', parsedScore)
-        }
-      }
+  // passs the test type as clep_exam
+  if (activeFilters.testType.trim()) {
+    params.append('clep_exam', activeFilters.testType.trim())
+  }
+  
+  // pass score as min_score (is optional, will just not filter if not passed in)
+  if (activeFilters.score !== '') {
+    const parsedScore = Number(activeFilters.score)
+    if (!Number.isNaN(parsedScore) && parsedScore >= 0) {
+      params.append('min_score', parsedScore)
     }
-
-    return params.toString()
   }
 
-  const handleSearch = async (event) => {
+  const queryString = params.toString()
+  console.log('Built query string:', queryString)
+  return queryString
+}
+
+  const handleSearch = (event) => {
     event?.preventDefault()
+
+    // Require test type
+    if (!filters.testType.trim()) {
+      setErrorMessage('Please select a CLEP exam type.')
+      return
+    }
 
     if (filters.score !== '' && Number(filters.score) < 0) {
       setErrorMessage('Score cannot be negative.')
       return
     }
 
+    setErrorMessage('') // Clear any previous errors
     const queryString = buildQueryString(filters)
-    const endpoint = `${normalizedBaseUrl}/tests/search${queryString ? `?${queryString}` : ''}`
-    console.log('Making request to:', endpoint)
-
-    setLoading(true)
-    setErrorMessage('')
-
-    try {
-      const response = await fetch(endpoint)
-      if (!response.ok) throw new Error('Unable to fetch test data. Please try again.')
-
-      const payload = await response.json()
-      const payloadData = payload?.data ?? []
-      setResults(payloadData)
-      setLastQuery({ endpoint, count: payload?.count ?? payloadData.length })
-      onResults?.(payload)
-    } catch (error) {
-      setErrorMessage(error.message ?? 'Something went wrong while searching.')
-      onError?.(error)
-    } finally {
-      setLoading(false)
-    }
+    console.log('Navigating with query string:', queryString)
+    navigate(`/results${queryString ? `?${queryString}` : ''}`)
   }
 
   return (
@@ -107,7 +102,7 @@ const Searchbar = ({ apiBaseUrl = DEFAULT_API_BASE_URL, onResults, onError }) =>
           className="grid items-end gap-5 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto]"
           onSubmit={handleSearch}
         >
-          {/* Test Type */}
+          {/* CLEP Test Type */}
           <div className="flex flex-col gap-3">
             <label className="text-sm font-semibold text-gray-600" htmlFor="testType">
               Test Type
@@ -136,7 +131,7 @@ const Searchbar = ({ apiBaseUrl = DEFAULT_API_BASE_URL, onResults, onError }) =>
             </div>
           </div>
 
-          {/* Test Score */}
+          {/* CLEP Test Score */}
           <div className="flex flex-col gap-3">
             <label className="text-sm font-semibold text-gray-600" htmlFor="testScore">
               Test Score
@@ -161,7 +156,6 @@ const Searchbar = ({ apiBaseUrl = DEFAULT_API_BASE_URL, onResults, onError }) =>
           <button
             className="inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-indigo-500 to-indigo-400 px-8 py-3 text-lg font-semibold text-white shadow-md transition hover:-translate-y-0.5 hover:shadow-lg disabled:translate-y-0 disabled:cursor-not-allowed disabled:opacity-70"
             type="submit"
-            disabled={loading}
           >
             <span className="text-lg" aria-hidden="true">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
@@ -174,44 +168,16 @@ const Searchbar = ({ apiBaseUrl = DEFAULT_API_BASE_URL, onResults, onError }) =>
                 <circle cx="11" cy="11" r="6" stroke="currentColor" strokeWidth="2" />
               </svg>
             </span>
-            {loading ? 'Searching…' : 'Search'}
+            Search
           </button>
         </form>
 
         <p className="text-base text-gray-500">
           CLEP scores range from 20 to 80. Most schools require a minimum of 50 for credit.
         </p>
+
+        {errorMessage && <p className="mt-4 font-semibold text-red-600">{errorMessage}</p>}
       </section>
-
-      {errorMessage && <p className="mt-4 font-semibold text-red-600">{errorMessage}</p>}
-
-      {!errorMessage && lastQuery && (
-        <p className="mt-6 text-base text-gray-500">
-          Showing {results.length} result{results.length === 1 ? '' : 's'} for {lastQueryDescription}.
-        </p>
-      )}
-
-      {!loading && !errorMessage && results.length > 0 && (
-        <div className="mt-4 space-y-3 rounded-3xl bg-white p-6 shadow-md">
-          <div className="grid grid-cols-2 gap-3 text-sm font-semibold text-gray-500 sm:grid-cols-4 sm:text-base">
-            <span>Test</span>
-            <span>Score</span>
-            <span>Location</span>
-            <span>School</span>
-          </div>
-          {results.map((result, index) => (
-            <div
-              key={result.id ?? index}
-              className="grid grid-cols-2 gap-3 border-t border-gray-100 pt-3 text-sm text-gray-800 sm:grid-cols-4 sm:text-base"
-            >
-              <span>{filters.testType || 'N/A'}</span>
-              <span>{filters.testType === 'Humanities' ? result.Humanities : result['American Government'] ?? '—'}</span>
-              <span>{`${result.City}, ${result.State}` ?? 'Unknown'}</span>
-              <span>{result['School Name'] ?? 'Unknown'}</span>
-            </div>
-          ))}
-        </div>
-      )}
     </>
   )
 }
