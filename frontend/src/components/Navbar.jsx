@@ -1,35 +1,37 @@
 import React from 'react'
-import { Link } from 'react-router'
+import { Link, NavLink } from 'react-router'
 
 const Navbar = () => {
   return (
-    <nav className="bg-white shadow-md">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
-          {/* Modern States logo */}
-          <div className="flex-shrink-0">
-            <h1 className="text-2xl font-bold text-black">Modern States</h1>
-          </div>
-
-          {/* Admin and registar login buttons */}
-          <div className="flex space-x-4">
-            <Link
-              to="/admin"
-              className="btn btn-primary px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors duration-200 font-medium"
-            >
-              Admin Login
-            </Link>
-
-            <Link
-              to="/register"
-              className="btn btn-primary px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors duration-200 font-medium"
-            >
-              Institution Login
-            </Link>
-          </div>
+    <header className="sticky top-0 z-40 border-b border-white/20 bg-white/70 backdrop-blur-lg">
+      <nav className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
+        <Link to="/" className="text-xl font-semibold tracking-tight text-slate-900">
+          Modern States
+        </Link>
+        
+        <div className="flex items-center gap-3">
+          <Link
+            to="/registrar"
+            className="rounded-full bg-slate-900 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-800"
+          >
+            Institution Login
+          </Link>
+          
+          <Link
+            to="/admin"
+            className="rounded-full bg-slate-900 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-800"
+          >
+            Admin Login
+          </Link>
+          
+          <button
+            className="rounded-full bg-slate-900 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-800"
+          >
+            AI Chatbot
+          </button>
         </div>
-      </div>
-    </nav>
+      </nav>
+    </header>
   )
 }
 

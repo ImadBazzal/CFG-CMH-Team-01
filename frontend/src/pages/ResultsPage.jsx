@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { MapPin, Filter } from 'lucide-react';
 import { useSearchParams } from 'react-router-dom';
-import Map from '../components/Map';
-import { getCoordinates } from '../utils/coordinates';
+
+
+
 
 const ResultsPage = () => {
   const [searchParams] = useSearchParams();
@@ -29,14 +30,38 @@ const ResultsPage = () => {
     maxTranscriptionFee: ''
   });
 
-  // Update filters when URL params change
-  useEffect(() => {
-    setFilters(prev => ({
-      ...prev,
-      clep_exam: getDecodedParam('clep_exam'),
-      min_score: getDecodedParam('min_score')
-    }));
-  }, [searchParams]);
+
+
+
+
+
+
+const [showReportForm, setShowReportForm] = useState(false);
+const [reportData, setReportData] = useState({
+  institutionName: '',
+  clepExams: []
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   // fetch schools from backend
   useEffect(() => {
@@ -85,38 +110,23 @@ const ResultsPage = () => {
 
       // Transform backend data to match frontend structure
       // Based on MS Sample SMALL table structure
-      const transformedSchools = result.data.map((school, index) => {
-        // Generate realistic data based on school index for consistency
-        const seed = school['School Name']?.length || index;
-        const enrollment = 10000 + (seed * 137) % 40000;
-        const maxCredits = 15 + (seed * 7) % 16; // 15-30 credits
-        const transcriptionFee = 25 + (seed * 13) % 76; // $25-$100
-        const scoreValidity = 2 + (seed * 3) % 4; // 2-5 years
-        const canEnrolledUse = (seed * 17) % 3 !== 0; // ~67% yes
-        const canUseForFailed = (seed * 23) % 4 !== 0; // ~75% yes
-        
-        return {
-          id: school.id || index + 1,
-          name: school['School Name'] || 'Unknown School',
-          city: school.City || 'Unknown',
-          state: school.State || 'Unknown',
-          location: `${school.City || 'Unknown'}, ${school.State || 'Unknown'}`,
-          humanities: school.Humanities,
-          americanGovernment: school['American Government'],
-          diCode: school['DI Code'],
-          enrollment,
-          maxCredits,
-          transcriptionFee,
-          scoreValidity,
-          canEnrolledStudentsUseCLEP: canEnrolledUse,
-          canUseForFailedCourses: canUseForFailed,
-          // Use accurate coordinates based on city/state
-          ...(() => {
-            const [lat, lng] = getCoordinates(school.City, school.State, index);
-            return { lat, lng };
-          })(),
-        };
-      });
+      const transformedSchools = result.data.map((school, index) => ({
+        id: school.id || index + 1,
+        name: school['School Name'] || 'Unknown School',
+        city: school.City || 'Unknown',
+        state: school.State || 'Unknown',
+        location: `${school.City || 'Unknown'}, ${school.State || 'Unknown'}`,
+        humanities: school.Humanities,
+        americanGovernment: school['American Government'],
+        diCode: school['DI Code'],
+
+
+
+
+        // fake coordinates for map placement
+        lat: 37 + Math.random() * 10,
+        lng: -95 + Math.random() * 20,
+      }));
 
       // apply frontend filters
       let filtered = transformedSchools;
@@ -136,6 +146,41 @@ const ResultsPage = () => {
     }
   };
 
+  const handleReportSubmit = async (e) => {
+  e.preventDefault();
+  
+  try {
+    // Send report to backend
+    const response = await fetch('http://localhost:8000/api/reports/outdated', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(reportData)
+    });
+    
+    if (response.ok) {
+      alert('Thank you for your report! We will review the information.');
+      setShowReportForm(false);
+      setReportData({ institutionName: '', clepExams: [] });
+    } else {
+      alert('Failed to submit report. Please try again.');
+    }
+  } catch (err) {
+    console.error('Error submitting report:', err);
+    alert('Failed to submit report. Please try again.');
+  }
+};
+
+const handleClepExamToggle = (exam) => {
+  setReportData(prev => ({
+    ...prev,
+    clepExams: prev.clepExams.includes(exam)
+      ? prev.clepExams.filter(e => e !== exam)
+      : [...prev.clepExams, exam]
+  }));
+};
+
   const handleFilterChange = (key, value) => setFilters((prev) => ({ ...prev, [key]: value }));
 
   const handleApplyFilters = () => {
@@ -146,37 +191,60 @@ const ResultsPage = () => {
   // UI
   return (
     <div className="relative w-screen h-screen overflow-hidden">
-      {/* MAP */}
-      <div className="absolute inset-0 z-10">
-        {loading ? (
-          <div className="w-full h-full flex items-center justify-center bg-gray-100">
-            <div className="text-center">
-              <MapPin className="w-16 h-16 text-gray-600 mx-auto mb-4" />
-              <p className="text-gray-600 text-lg font-medium">Loading CLEP Institutions...</p>
+      {/* MAP BACKGROUND */}
+      <div className="absolute inset-0 bg-gray-900">
+        <div className="w-full h-full flex items-center justify-center relative">
+          {/* subtle grid overlay */}
+          <div className="absolute inset-0 opacity-10">
+            <div className="grid grid-cols-12 grid-rows-8 h-full w-full">
+              {[...Array(96)].map((_, i) => (
+                <div key={i} className="border border-gray-700"></div>
+              ))}
             </div>
           </div>
-        ) : (
-          <Map 
-            schools={schools} 
-            onSchoolClick={setSelectedSchool} 
-            selectedSchool={selectedSchool}
-          />
-        )}
-        
-        {/* legend */}
-        <div className="absolute bottom-4 left-4 bg-white rounded-lg shadow-lg px-4 py-3 z-40">
-          <div className="flex items-center gap-2 text-sm">
-            <div className="w-3 h-3 bg-blue-600 rounded-full"></div>
-            <span className="text-gray-700 font-medium">Accepts CLEP Credit</span>
+
+          {/* map placeholder center text */}
+          <div className="relative z-10 text-center">
+            <MapPin className="w-16 h-16 text-gray-600 mx-auto mb-4" />
+            <p className="text-gray-400 text-lg font-medium">
+              {loading ? 'Loading CLEP Institutions...' : 'Interactive Map'}
+            </p>
+            <p className="text-gray-500 text-sm mt-2">
+              {schools.length
+                ? `${schools.length} schools found`
+                : loading
+                ? 'Fetching data from registrar directory...'
+                : 'No results — adjust filters'}
+            </p>
           </div>
-          <div className="text-xs text-gray-500 mt-1">
-            {schools.length} schools found
+
+          {/* dynamic map markers */}
+          {schools.slice(0, 20).map((school, index) => (
+            <div
+              key={school.id}
+              className="absolute w-6 h-6 bg-blue-600 rounded-full border-4 border-white shadow-lg cursor-pointer hover:bg-blue-700"
+              style={{
+                top: `${20 + (index * 11) % 60}%`,
+                left: `${25 + (index * 7) % 50}%`,
+              }}
+              title={school.name}
+              onClick={() => setSelectedSchool(school.id)}
+            />
+          ))}
+
+          {/* legend */}
+          <div className="absolute bottom-4 left-4 bg-white rounded-lg shadow-lg px-4 py-3 z-20">
+            <div className="flex items-center gap-2 text-sm">
+              <div className="w-3 h-3 bg-blue-600 rounded-full"></div>
+              <span className="text-gray-700 font-medium">Accepts CLEP Credit</span>
+            </div>
+
           </div>
         </div>
       </div>
 
       {/* FILTER SIDEBAR */}
-      <div className="absolute top-6 left-6 z-50 w-80 bg-white/95 backdrop-blur-md rounded-xl border border-gray-200 shadow-lg p-5">
+      <div className="absolute top-6 left-6 z-30 w-80 bg-white/95 backdrop-blur-md rounded-xl border border-gray-200 shadow-lg p-5">
         <div className="flex items-center gap-2 mb-4">
           <Filter className="w-5 h-5 text-gray-700" />
           <h2 className="font-semibold text-gray-900">Filters</h2>
@@ -192,16 +260,35 @@ const ResultsPage = () => {
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
             >
               <option value="">All CLEP Exams</option>
-              <option value="Algebra">Algebra</option>
-              <option value="Humanities">Humanities</option>
               <option value="American Government">American Government</option>
+              <option value="American Literature">American Literature</option>
+              <option value="Analyzing & Interpreting Literature">Analyzing & Interpreting Literature</option>
               <option value="Biology">Biology</option>
+              <option value="Calculus">Calculus</option>
               <option value="Chemistry">Chemistry</option>
+              <option value="College Algebra">College Algebra</option>
               <option value="College Composition">College Composition</option>
-              <option value="History of the United States">History of the United States</option>
+              <option value="College Mathematics">College Mathematics</option>
+              <option value="English Literature">English Literature</option>
+              <option value="Financial Accounting">Financial Accounting</option>
+              <option value="French Language">French Language</option>
+              <option value="German Language">German Language</option>
+              <option value="History of the United States I">History of the United States I</option>
+              <option value="History of the United States II">History of the United States II</option>
+              <option value="Human Growth and Development">Human Growth and Development</option>
+              <option value="Information Systems">Information Systems</option>
+              <option value="Introductory Business Law">Introductory Business Law</option>
+              <option value="Introductory Psychology">Introductory Psychology</option>
+              <option value="Introductory Sociology">Introductory Sociology</option>
+              <option value="Natural Sciences">Natural Sciences</option>
+              <option value="Precalculus">Precalculus</option>
+              <option value="Principles of Macroeconomics">Principles of Macroeconomics</option>
+              <option value="Principles of Microeconomics">Principles of Microeconomics</option>
               <option value="Principles of Management">Principles of Management</option>
-              <option value="Spanish">Spanish</option>
-              <option value="Other">Other</option>
+              <option value="Principles of Marketing">Principles of Marketing</option>
+              <option value="Spanish Language">Spanish Language</option>
+              <option value="Western Civilization I">Western Civilization I</option>
+              <option value="Western Civilization II">Western Civilization II</option>
             </select>
           </div>
 
@@ -219,6 +306,21 @@ const ResultsPage = () => {
             max="80"
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
           />
+        </div>
+
+        {/* last updated */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Institution Policy Last Updated</label>
+          <select
+            value={filters.last_updated}
+            onChange={(e) => handleFilterChange('last_updated', e.target.value)}
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="">Any time</option>
+            <option value="1-6">1-6 months ago</option>
+            <option value="6-12">6-12 months ago</option>
+            <option value="12+">1+ years ago</option>
+          </select>
         </div>
 
           {/* city */}
@@ -275,9 +377,126 @@ const ResultsPage = () => {
           </button>
         </div>
       </div>
+      {/* REPORT BUTTON */}
+      <button
+        onClick={() => setShowReportForm(true)}
+        className="fixed bottom-6 right-6 z-30 bg-red-600 text-white px-6 py-3 rounded-lg shadow-lg hover:bg-red-700 transition-colors font-medium text-sm"
+      >
+        Report Outdated Institution Information
+      </button>
+
+      {/* REPORT FORM POPUP */}
+      {showReportForm && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 flex items-center justify-center p-4">
+          <div className="bg-white rounded-xl shadow-2xl w-full max-w-md max-h-[80vh] overflow-y-auto">
+            <div className="p-6">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-lg font-semibold text-gray-900">Report Outdated Information</h3>
+                <button
+                  onClick={() => setShowReportForm(false)}
+                  className="text-gray-400 hover:text-gray-600"
+                >
+                  <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+
+              <form onSubmit={handleReportSubmit} className="space-y-4">
+                {/* Institution Name */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Institution Name *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={reportData.institutionName}
+                    onChange={(e) => setReportData(prev => ({ ...prev, institutionName: e.target.value }))}
+                    placeholder="Enter institution name"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                  />
+                </div>
+
+                {/* CLEP Exam Types */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    CLEP Exam Types * (select all that apply)
+                  </label>
+                  <div className="border border-gray-300 rounded-lg max-h-48 overflow-y-auto p-3 space-y-2">
+                    {[
+                      'All policies',
+                      'American Government',
+                      'American Literature',
+                      'Analyzing & Interpreting Literature',
+                      'Biology',
+                      'Calculus',
+                      'Chemistry',
+                      'College Algebra',
+                      'College Composition',
+                      'College Mathematics',
+                      'English Literature',
+                      'Financial Accounting',
+                      'French Language',
+                      'German Language',
+                      'History of the United States I',
+                      'History of the United States II',
+                      'Human Growth and Development',
+                      'Information Systems',
+                      'Introductory Business Law',
+                      'Introductory Psychology',
+                      'Introductory Sociology',
+                      'Natural Sciences',
+                      'Precalculus',
+                      'Principles of Macroeconomics',
+                      'Principles of Microeconomics',
+                      'Principles of Management',
+                      'Principles of Marketing',
+                      'Spanish Language',
+                      'Western Civilization I',
+                      'Western Civilization II'
+                    ].map((exam) => (
+                      <label key={exam} className="flex items-center space-x-2 cursor-pointer hover:bg-gray-50 p-1 rounded">
+                        <input
+                          type="checkbox"
+                          checked={reportData.clepExams.includes(exam)}
+                          onChange={() => handleClepExamToggle(exam)}
+                          className="w-4 h-4 text-red-600 border-gray-300 rounded focus:ring-red-500"
+                        />
+                        <span className="text-sm text-gray-700">{exam}</span>
+                      </label>
+                    ))}
+                  </div>
+                  <p className="text-xs text-gray-500 mt-1">
+                    {reportData.clepExams.length} exam(s) selected
+                  </p>
+                </div>
+
+                {/* Buttons */}
+                <div className="flex gap-3 pt-2">
+                  <button
+                    type="button"
+                    onClick={() => setShowReportForm(false)}
+                    className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors font-medium"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={!reportData.institutionName || reportData.clepExams.length === 0}
+                    className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    Submit Report
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* SCHOOL DROPDOWN */}
-      <div className="absolute top-6 right-6 z-50 w-96 bg-white/95 backdrop-blur-md rounded-xl border border-gray-200 shadow-lg p-5">
+      <div className="absolute top-6 right-6 z-30 w-96 bg-white/95 backdrop-blur-md rounded-xl border border-gray-200 shadow-lg p-5">
         <label className="block text-sm font-medium text-gray-700 mb-2">Select a School</label>
         <select
           value={selectedSchool}
