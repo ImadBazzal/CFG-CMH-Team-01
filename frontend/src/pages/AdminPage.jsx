@@ -177,10 +177,10 @@ const AdminDashboard = ({ onLogout }) => {
               </div>
             </div>
 
-            {/* Geographic Distribution */}
+            {/* Geographic Distribution with Transparent Scrollbar */}
             <div className="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
               <h2 className="text-lg font-semibold text-white mb-4">Top States by Institution Count</h2>
-              <div className="space-y-3 max-h-[200px] overflow-y-auto">
+              <div className="space-y-3 max-h-[260px] overflow-y-auto pr-2 custom-scrollbar">
                 {Object.entries(stats.data.stateBreakdown)
                   .sort(([,a], [,b]) => b - a)
                   .slice(0, 10)
@@ -196,6 +196,33 @@ const AdminDashboard = ({ onLogout }) => {
           </div>
         )}
       </div>
+
+      {/* Custom Transparent Scrollbar Styles */}
+      <style jsx>{`
+        .custom-scrollbar::-webkit-scrollbar {
+          width: 6px;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-track {
+          background: transparent;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+          background: rgba(255, 255, 255, 0.1);
+          border-radius: 10px;
+          transition: background 0.3s ease;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+          background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Firefox */
+        .custom-scrollbar {
+          scrollbar-width: thin;
+          scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
+        }
+      `}</style>
     </main>
   )
 }
