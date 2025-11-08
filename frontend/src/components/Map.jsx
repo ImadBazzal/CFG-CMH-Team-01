@@ -49,42 +49,51 @@ const MapController = ({ selectedSchool, schools }) => {
 
 const Map = ({ schools, onSchoolClick, selectedSchool }) => {
   return (
-    <MapContainer 
-      center={[39.8283, -98.5795]} 
-      zoom={4} 
-      zoomControl={false}
-      className="w-full h-full"
-      style={{ minHeight: '400px' }}
-    >
-      <MapController selectedSchool={selectedSchool} schools={schools} />
-      <TileLayer
-        url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
-      />
-      
-      {schools.map((school) => {
-        const lat = school.lat || school.latitude || 39.8283;
-        const lng = school.lng || school.longitude || -98.5795;
+    <div className="relative w-full h-full">
+      <MapContainer 
+        center={[39.8283, -98.5795]} 
+        zoom={4} 
+        zoomControl={false}
+        className="w-full h-full galaxy-map"
+        style={{ minHeight: '400px' }}
+      >
+        <MapController selectedSchool={selectedSchool} schools={schools} />
+        <TileLayer
+          url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+        />
         
-        return (
-          <Marker 
-            key={school.id}
-            position={[lat, lng]}
-            icon={selectedSchool === school.id ? redIcon : blueIcon}
-            eventHandlers={{
-              click: () => onSchoolClick(school.id)
-            }}
-          >
-            <Popup>
-              <div>
-                <h3 className="font-semibold">{school.name}</h3>
-                <p>{school.location}</p>
-              </div>
-            </Popup>
-          </Marker>
-        );
-      })}
-    </MapContainer>
+        {schools.map((school) => {
+          const lat = school.lat || school.latitude || 39.8283;
+          const lng = school.lng || school.longitude || -98.5795;
+          
+          return (
+            <Marker 
+              key={school.id}
+              position={[lat, lng]}
+              icon={selectedSchool === school.id ? redIcon : blueIcon}
+              eventHandlers={{
+                click: () => onSchoolClick(school.id)
+              }}
+            >
+              <Popup>
+                <div>
+                  <h3 className="font-semibold">{school.name}</h3>
+                  <p>{school.location}</p>
+                </div>
+              </Popup>
+            </Marker>
+          );
+        })}
+      </MapContainer>
+
+      {/* subtle galaxy tint overlay */}
+      <div className="pointer-events-none absolute inset-0 z-10 mix-blend-screen opacity-60">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_15%_20%,rgba(111,125,255,0.35),transparent_55%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_10%,rgba(249,123,255,0.25),transparent_60%)]" />
+        <div className="absolute inset-0 bg-gradient-to-br from-[#030712]/20 via-transparent to-[#050917]/60" />
+      </div>
+    </div>
   );
 };
 

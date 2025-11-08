@@ -201,14 +201,14 @@ const handleClepExamToggle = (exam) => {
 
   // UI
   return (
-    <div className="relative w-screen h-screen overflow-hidden">
+    <div className="relative w-screen min-h-[calc(100vh-4rem)] overflow-hidden mt-16 bg-[radial-gradient(circle_at_15%_20%,rgba(71,134,255,0.25),transparent_45%),radial-gradient(circle_at_80%_10%,rgba(255,86,180,0.25),transparent_40%),linear-gradient(135deg,#030712,#020310_55%,#050917)]">
       {/* MAP */}
       <div className="absolute inset-0 z-10">
         {loading ? (
-          <div className="w-full h-full flex items-center justify-center bg-gray-100">
+          <div className="w-full h-full flex items-center justify-center bg-[#030712]">
             <div className="text-center">
-              <MapPin className="w-16 h-16 text-gray-600 mx-auto mb-4" />
-              <p className="text-gray-600 text-lg font-medium">Loading CLEP Institutions...</p>
+              <MapPin className="w-16 h-16 text-white/60 mx-auto mb-4" />
+              <p className="text-white/70 text-lg font-medium">Loading CLEP Institutions...</p>
             </div>
           </div>
         ) : (
@@ -220,22 +220,24 @@ const handleClepExamToggle = (exam) => {
         )}
         
         {/* legend */}
-        <div className="absolute bottom-4 left-4 bg-white rounded-lg shadow-lg px-4 py-3 z-40">
-          <div className="flex items-center gap-2 text-sm">
-            <div className="w-3 h-3 bg-blue-600 rounded-full"></div>
-            <span className="text-gray-700 font-medium">Accepts CLEP Credit</span>
+        <div className="absolute bottom-4 left-4 z-40 rounded-2xl border border-white/10 bg-gradient-to-br from-[#070916]/90 via-[#0b0f25]/90 to-[#0f1635]/85 px-4 py-3 shadow-[0_15px_35px_rgba(5,9,23,0.45)] backdrop-blur-xl">
+          <div className="flex items-center gap-2 text-sm text-white">
+            <div className="w-3 h-3 bg-[#6f7dff] rounded-full"></div>
+            <span className="font-medium text-white/80">Accepts CLEP Credit</span>
           </div>
-          <div className="text-xs text-gray-500 mt-1">
+          <div className="text-xs text-white/60 mt-1">
             {schools.length} schools found
           </div>
         </div>
       </div>
 
       {/* FILTER SIDEBAR */}
-      <div className="absolute top-6 left-6 z-50 w-80 bg-white/10 backdrop-blur-md rounded-xl border border-white/20 shadow-2xl p-5">
+      <div className="absolute top-6 left-6 z-50 w-80 rounded-3xl border border-white/10 bg-gradient-to-br from-[#070916]/95 via-[#0b0f25]/90 to-[#131b3c]/85 p-5 shadow-[0_25px_45px_rgba(5,8,24,0.55)] backdrop-blur-2xl">
         <div className="flex items-center gap-2 mb-4">
-          <Filter className="w-5 h-5 text-white/80" />
-          <h2 className="font-semibold text-white">Filters</h2>
+          <Filter className="w-5 h-5 text-[#7f8fff]" />
+          <h2 className="font-semibold text-white tracking-[0.08em] uppercase text-xs">
+            Filters
+          </h2>
         </div>
 
         <div className="space-y-4">
@@ -245,7 +247,7 @@ const handleClepExamToggle = (exam) => {
             <select
               value={filters.clep_exam}
               onChange={(e) => handleFilterChange('clep_exam', e.target.value)}
-              className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/50 focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
+              className="w-full px-3 py-2 bg-white/5 border border-white/15 rounded-xl text-white placeholder-white/40 focus:ring-2 focus:ring-[#6f7dff]/60 focus:border-[#6f7dff]/80"
             >
               <option value="">All CLEP Exams</option>
               <option value="American Government">American Government</option>
@@ -292,7 +294,7 @@ const handleClepExamToggle = (exam) => {
             placeholder="e.g. 50"
             min="20"
             max="80"
-            className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/50 focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
+            className="w-full px-3 py-2 bg-white/5 border border-white/15 rounded-xl text-white placeholder-white/40 focus:ring-2 focus:ring-[#6f7dff]/60 focus:border-[#6f7dff]/80"
           />
         </div>
 
@@ -302,7 +304,7 @@ const handleClepExamToggle = (exam) => {
           <select
             value={filters.last_updated}
             onChange={(e) => handleFilterChange('last_updated', e.target.value)}
-            className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
+            className="w-full px-3 py-2 bg-white/5 border border-white/15 rounded-xl text-white focus:ring-2 focus:ring-[#6f7dff]/60 focus:border-[#6f7dff]/80"
           >
             <option value="">Any time</option>
             <option value="1-6">1-6 months ago</option>
@@ -319,7 +321,7 @@ const handleClepExamToggle = (exam) => {
               value={filters.city}
               onChange={(e) => handleFilterChange('city', e.target.value)}
               placeholder="e.g. Boston"
-              className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/50 focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
+              className="w-full px-3 py-2 bg-white/5 border border-white/15 rounded-xl text-white placeholder-white/40 focus:ring-2 focus:ring-[#6f7dff]/60 focus:border-[#6f7dff]/80"
             />
           </div>
 
@@ -329,7 +331,7 @@ const handleClepExamToggle = (exam) => {
             <select
               value={filters.state}
               onChange={(e) => handleFilterChange('state', e.target.value)}
-              className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
+              className="w-full px-3 py-2 bg-white/5 border border-white/15 rounded-xl text-white focus:ring-2 focus:ring-[#6f7dff]/60 focus:border-[#6f7dff]/80"
             >
               <option value="">All States</option>
               <option value="CA">California</option>
@@ -352,14 +354,14 @@ const handleClepExamToggle = (exam) => {
                 value={filters.maxTranscriptionFee}
                 onChange={(e) => handleFilterChange('maxTranscriptionFee', e.target.value)}
                 placeholder="100"
-                className="w-full pl-8 pr-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/50 focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
+                className="w-full pl-8 pr-3 py-2 bg-white/5 border border-white/15 rounded-xl text-white placeholder-white/40 focus:ring-2 focus:ring-[#6f7dff]/60 focus:border-[#6f7dff]/80"
               />
             </div>
           </div>
 
           <button
             onClick={handleApplyFilters}
-            className="w-full bg-gradient-to-r from-blue-500 to-blue-600 text-white py-2 px-4 rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all duration-200 font-medium shadow-lg"
+            className="w-full bg-gradient-to-r from-[#6f7dff] via-[#7f5dff] to-[#5ecfff] text-[#050812] py-2.5 px-4 rounded-2xl font-semibold tracking-wide shadow-[0_15px_35px_rgba(110,125,255,0.35)] transition-all duration-200 hover:-translate-y-0.5"
           >
             Apply Filters
           </button>
@@ -368,21 +370,21 @@ const handleClepExamToggle = (exam) => {
       {/* REPORT BUTTON */}
       <button
         onClick={() => setShowReportForm(true)}
-        className="fixed bottom-6 right-6 z-30 bg-red-600 text-white px-6 py-3 rounded-lg shadow-lg hover:bg-red-700 transition-colors font-medium text-sm"
+        className="fixed bottom-6 right-6 z-30 inline-flex items-center gap-2 rounded-full border border-white/20 bg-gradient-to-r from-[#6f7dff] via-[#7f5dff] to-[#f97bff] px-7 py-3 text-white text-sm font-semibold tracking-wide shadow-[0_18px_45px_rgba(111,125,255,0.35)] backdrop-blur-xl transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_25px_55px_rgba(111,125,255,0.45)]"
       >
         Report Outdated Institution Information
       </button>
 
       {/* REPORT FORM POPUP */}
       {showReportForm && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 flex items-center justify-center p-4">
-          <div className="bg-white rounded-xl shadow-2xl w-full max-w-md max-h-[80vh] overflow-y-auto">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 flex items-center justify-center p-4">
+          <div className="w-full max-w-md max-h-[80vh] overflow-y-auto rounded-3xl border border-white/10 bg-gradient-to-br from-[#070916]/95 via-[#131b3c]/90 to-[#1a1e3f]/85 shadow-[0_30px_65px_rgba(4,6,15,0.7)]">
             <div className="p-6">
               <div className="flex justify-between items-center mb-4">
-                <h3 className="text-lg font-semibold text-gray-900">Report Outdated Information</h3>
+                <h3 className="text-lg font-semibold text-white">Report Outdated Information</h3>
                 <button
                   onClick={() => setShowReportForm(false)}
-                  className="text-gray-400 hover:text-gray-600"
+                  className="text-white/50 hover:text-white/80 transition-colors"
                 >
                   <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -393,7 +395,7 @@ const handleClepExamToggle = (exam) => {
               <form onSubmit={handleReportSubmit} className="space-y-4">
                 {/* Institution Name */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-white/80 mb-1">
                     Institution Name *
                   </label>
                   <input
@@ -402,16 +404,16 @@ const handleClepExamToggle = (exam) => {
                     value={reportData.institutionName}
                     onChange={(e) => setReportData(prev => ({ ...prev, institutionName: e.target.value }))}
                     placeholder="Enter institution name"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                    className="w-full px-3 py-2 rounded-2xl border border-white/10 bg-white/5 text-white placeholder-white/40 focus:ring-2 focus:ring-[#f97bff]/60 focus:border-[#f97bff]/80"
                   />
                 </div>
 
                 {/* CLEP Exam Types */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-white/80 mb-2">
                     CLEP Exam Types * (select all that apply)
                   </label>
-                  <div className="border border-gray-300 rounded-lg max-h-48 overflow-y-auto p-3 space-y-2">
+                  <div className="border border-white/10 rounded-2xl max-h-48 overflow-y-auto p-3 space-y-2 bg-white/5">
                     {[
                       'All policies',
                       'American Government',
@@ -444,18 +446,18 @@ const handleClepExamToggle = (exam) => {
                       'Western Civilization I',
                       'Western Civilization II'
                     ].map((exam) => (
-                      <label key={exam} className="flex items-center space-x-2 cursor-pointer hover:bg-gray-50 p-1 rounded">
+                      <label key={exam} className="flex items-center space-x-2 cursor-pointer rounded-xl px-2 py-1 text-white/80 hover:bg-white/10">
                         <input
                           type="checkbox"
                           checked={reportData.clepExams.includes(exam)}
                           onChange={() => handleClepExamToggle(exam)}
-                          className="w-4 h-4 text-red-600 border-gray-300 rounded focus:ring-red-500"
+                          className="w-4 h-4 text-[#ff6b8f] border-white/20 rounded focus:ring-[#ff6b8f]"
                         />
-                        <span className="text-sm text-gray-700">{exam}</span>
+                        <span className="text-sm">{exam}</span>
                       </label>
                     ))}
                   </div>
-                  <p className="text-xs text-gray-500 mt-1">
+                  <p className="text-xs text-white/60 mt-1">
                     {reportData.clepExams.length} exam(s) selected
                   </p>
                 </div>
@@ -465,14 +467,14 @@ const handleClepExamToggle = (exam) => {
                   <button
                     type="button"
                     onClick={() => setShowReportForm(false)}
-                    className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors font-medium"
+                    className="flex-1 px-4 py-2 rounded-2xl border border-white/15 text-white/80 hover:bg-white/5 transition-colors font-medium"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
                     disabled={!reportData.institutionName || reportData.clepExams.length === 0}
-                    className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="flex-1 px-4 py-2 rounded-2xl bg-gradient-to-r from-[#ff6b8f] via-[#ff4d6d] to-[#f97bff] text-white font-semibold shadow-[0_12px_28px_rgba(255,107,143,0.35)] disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     Submit Report
                   </button>
@@ -484,12 +486,12 @@ const handleClepExamToggle = (exam) => {
       )}
 
       {/* SCHOOL DROPDOWN */}
-      <div className="absolute top-6 right-6 z-50 w-96 bg-white/10 backdrop-blur-md rounded-xl border border-white/20 shadow-2xl p-5">
-        <label className="block text-sm font-medium text-white/80 mb-2">Select a School</label>
+      <div className="absolute top-6 right-6 z-50 w-96 rounded-3xl border border-white/10 bg-gradient-to-br from-[#070916]/95 via-[#0b0f25]/90 to-[#131b3c]/85 p-5 shadow-[0_25px_45px_rgba(5,8,24,0.55)] backdrop-blur-2xl">
+        <label className="block text-sm font-medium text-white/80 mb-2 tracking-wide uppercase">Select a School</label>
         <select
           value={selectedSchool}
           onChange={(e) => setSelectedSchool(e.target.value)}
-          className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white focus:ring-2 focus:ring-blue-400 focus:border-blue-400 text-base"
+          className="w-full px-4 py-3 bg-white/5 border border-white/15 rounded-2xl text-white focus:ring-2 focus:ring-[#6f7dff]/60 focus:border-[#6f7dff]/80 text-base"
           disabled={loading}
         >
           <option value="">
@@ -503,45 +505,45 @@ const handleClepExamToggle = (exam) => {
         </select>
 
         {selectedSchool && (
-          <div className="mt-4 bg-white rounded-lg border border-gray-200 p-4 text-sm">
+          <div className="mt-4 rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-white shadow-inner shadow-black/20">
             {(() => {
               const school = schools.find((s) => s.id === selectedSchool);
               if (!school) return null;
               return (
                 <>
-                  <h3 className="font-semibold text-gray-900 mb-2">{school.name}</h3>
-                  <p className="text-gray-700">{school.location}</p>
-                  <p className="text-gray-500 mt-2">
+                  <h3 className="font-semibold text-white mb-2 text-base">{school.name}</h3>
+                  <p className="text-white/70">{school.location}</p>
+                  <p className="text-white/60 mt-2">
                     Enrollment: {school.enrollment?.toLocaleString() || 'N/A'}
                   </p>
-                  <p className="text-gray-500">
+                  <p className="text-white/60">
                     Max CLEP Credits: {school.maxCredits || 'N/A'}
                   </p>
-                  <p className="text-gray-500">
+                  <p className="text-white/60">
                     Transcription Fee: ${school.transcriptionFee || 'N/A'}
                   </p>
-                  <p className="text-gray-500">
+                  <p className="text-white/60">
                     Score Validity: {school.scoreValidity || 'N/A'} years
                   </p>
                   <div className="flex justify-between items-center mt-2">
-                    <span className="text-gray-600 text-sm">Enrolled Students Can Use:</span>
+                    <span className="text-white/70 text-sm">Enrolled Students Can Use:</span>
                     <span
                       className={`px-2 py-1 rounded text-xs font-medium ${
                         school.canEnrolledStudentsUseCLEP
-                          ? 'bg-green-100 text-green-800'
-                          : 'bg-red-100 text-red-800'
+                          ? 'bg-green-400/20 text-green-200'
+                          : 'bg-red-400/20 text-red-200'
                       }`}
                     >
                       {school.canEnrolledStudentsUseCLEP ? 'Yes' : 'No'}
                     </span>
                   </div>
                   <div className="flex justify-between items-center mt-1">
-                    <span className="text-gray-600 text-sm">Use for Failed Courses:</span>
+                    <span className="text-white/70 text-sm">Use for Failed Courses:</span>
                     <span
                       className={`px-2 py-1 rounded text-xs font-medium ${
                         school.canUseForFailedCourses
-                          ? 'bg-green-100 text-green-800'
-                          : 'bg-red-100 text-red-800'
+                          ? 'bg-green-400/20 text-green-200'
+                          : 'bg-red-400/20 text-red-200'
                       }`}
                     >
                       {school.canUseForFailedCourses ? 'Yes' : 'No'}
@@ -553,7 +555,7 @@ const handleClepExamToggle = (exam) => {
                       href={school.clepWebUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-blue-600 hover:text-blue-800 text-sm font-medium mt-3 inline-block"
+                      className="text-[#7f8fff] hover:text-white text-sm font-medium mt-3 inline-block"
                     >
                       View CLEP Policy →
                     </a>

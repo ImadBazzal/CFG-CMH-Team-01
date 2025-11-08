@@ -201,50 +201,26 @@ const Searchbar = ({ apiBaseUrl = DEFAULT_API_BASE_URL }) => {
               </div>
             </div>
 
-            {/* CLEP Test Score */}
+            {/* CLEP Test Score - numeric input */}
             <div className="flex flex-col gap-3">
               <label className="text-sm font-medium text-white/80" htmlFor="testScore">
                 Test Score
               </label>
-              <div className="relative rounded-xl border border-white/10 bg-white/5 px-4 py-3.5 transition-all duration-200 focus-within:border-blue-400 focus-within:ring-2 focus-within:ring-blue-400/50 focus-within:bg-white/10 hover:bg-white/8">
-                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-white/60 font-medium text-sm">
-                  Score:
-                </div>
+              <div className="relative">
                 <input
                   id="testScore"
                   name="testScore"
                   type="number"
-                  min="0"
+                  min="20"
                   max="80"
-                  step="1"
-                  placeholder="20-80"
+                  placeholder="Enter a score between 20-80"
                   value={filters.score}
                   onChange={handleScoreChange}
-                  className="w-full bg-transparent pl-16 text-base font-medium text-white placeholder-white/40 outline-none"
-                  style={{
-                    colorScheme: 'dark'
-                  }}
+                  className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3.5 text-base font-medium text-white placeholder-white/40 transition-all duration-200 focus:border-blue-400 focus:ring-2 focus:ring-blue-400/50 focus:bg-white/10 hover:bg-white/8 outline-none"
                 />
-                <div className="absolute right-4 top-1/2 -translate-y-1/2 flex flex-col gap-0">
-                  <button
-                    type="button"
-                    className="text-white/60 hover:text-white transition-colors"
-                    onClick={() => setFilters(prev => ({ ...prev, score: Math.min(80, (parseInt(prev.score) || 0) + 1).toString() }))}
-                  >
-                    <svg width="12" height="8" viewBox="0 0 12 8" fill="none">
-                      <path d="M1 7L6 2L11 7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                    </svg>
-                  </button>
-                  <button
-                    type="button"
-                    className="text-white/60 hover:text-white transition-colors"
-                    onClick={() => setFilters(prev => ({ ...prev, score: Math.max(0, (parseInt(prev.score) || 0) - 1).toString() }))}
-                  >
-                    <svg width="12" height="8" viewBox="0 0 12 8" fill="none">
-                      <path d="M1 1L6 6L11 1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                    </svg>
-                  </button>
-                </div>
+                <p className="mt-2 text-xs text-white/50">
+                  Leave blank to see all accepted scores.
+                </p>
               </div>
             </div>
           </div>
@@ -290,14 +266,14 @@ const Searchbar = ({ apiBaseUrl = DEFAULT_API_BASE_URL }) => {
         .custom-scrollbar::-webkit-scrollbar-thumb:hover {
           background: rgba(94, 207, 255, 0.5);
         }
-        
-        /* Hide number input arrows */
+
+        /* Hide number input arrows (legacy fallback) */
         input[type="number"]::-webkit-inner-spin-button,
         input[type="number"]::-webkit-outer-spin-button {
           -webkit-appearance: none;
           margin: 0;
         }
-        
+
         input[type="number"] {
           -moz-appearance: textfield;
         }
