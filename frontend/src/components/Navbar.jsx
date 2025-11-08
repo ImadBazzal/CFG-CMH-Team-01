@@ -17,7 +17,6 @@ const Navbar = () => {
             >
               Admin Login
             </Link>
-
             <Link
               to="/register"
               className="btn btn-primary px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors duration-200 font-medium"
