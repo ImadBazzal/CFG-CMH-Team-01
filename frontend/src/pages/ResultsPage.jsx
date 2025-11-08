@@ -1,15 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { MapPin, Filter } from 'lucide-react';
+import { useSearchParams } from 'react-router-dom';
 
 const ResultsPage = () => {
+  const [searchParams] = useSearchParams();
   const [selectedSchool, setSelectedSchool] = useState('');
   const [schools, setSchools] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [filters, setFilters] = useState({
-    clep_exam: '',
+    clep_exam: searchParams.get('clep_exam') || '',
     city: '',
     state: '',
+    min_score: searchParams.get('min_score') || '',
     maxCredits: '',
     maxTranscriptionFee: ''
   });
@@ -29,11 +32,14 @@ const ResultsPage = () => {
       if (filters.city) params.append('city', filters.city);
       if (filters.state) params.append('state', filters.state);
       if (filters.clep_exam) params.append('clep_exam', filters.clep_exam);
+      if (filters.min_score) params.append('min_score', filters.min_score);
 
       const response = await fetch(`http://localhost:8000/tests/search?${params}`);
       if (!response.ok) throw new Error('Failed to fetch schools');
 
       const result = await response.json();
+
+      // ... rest of the function stays the same
 
       // transform backend data into front-end shape
       const transformedSchools = result.data.map((institution, i) => ({
@@ -148,27 +154,35 @@ const ResultsPage = () => {
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
             >
               <option value="">All CLEP Exams</option>
-              <option value="5">Calculus</option>
-              <option value="7">College Algebra</option>
-              <option value="8">College Composition</option>
-              <option value="28">Principles of Macroeconomics</option>
-              <option value="30">Principles of Marketing</option>
+              <option value="Algebra">Algebra</option>
+              <option value="Humanities">Humanities</option>
+              <option value="American Government">American Government</option>
+              <option value="Biology">Biology</option>
+              <option value="Chemistry">Chemistry</option>
+              <option value="College Composition">College Composition</option>
+              <option value="History of the United States">History of the United States</option>
+              <option value="Principles of Management">Principles of Management</option>
+              <option value="Spanish">Spanish</option>
+              <option value="Other">Other</option>
             </select>
           </div>
 
           {/* min credits */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Minimum CLEP Score
-            </label>
-            <input
-              type="number"
-              value={filters.maxCredits}
-              onChange={(e) => handleFilterChange('maxCredits', e.target.value)}
-              placeholder="e.g. 30"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
+         {/* min score */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Minimum CLEP Score
+          </label>
+          <input
+            type="number"
+            value={filters.min_score}
+            onChange={(e) => handleFilterChange('min_score', e.target.value)}
+            placeholder="e.g. 50"
+            min="20"
+            max="80"
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
 
           {/* city */}
           <div>

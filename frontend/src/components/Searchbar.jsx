@@ -36,31 +36,39 @@ const Searchbar = ({ apiBaseUrl = DEFAULT_API_BASE_URL }) => {
   }
 
   const buildQueryString = (activeFilters) => {
-    const params = new URLSearchParams()
+  const params = new URLSearchParams()
 
-    if (activeFilters.testType.trim()) params.append('test_name', activeFilters.testType.trim())
-    if (activeFilters.score !== '') {
-      const parsedScore = Number(activeFilters.score)
-      if (!Number.isNaN(parsedScore)) {
-        if (activeFilters.testType === 'Humanities') {
-          params.append('min_humanities', parsedScore)
-        } else if (activeFilters.testType === 'American Government') {
-          params.append('min_american_government', parsedScore)
-        }
-      }
-    }
-
-    return params.toString()
+  // passs the test type as clep_exam
+  if (activeFilters.testType.trim()) {
+    params.append('clep_exam', activeFilters.testType.trim())
   }
+  
+  // pass score as min_score (is optional, will just not filter if not passed in)
+  if (activeFilters.score !== '') {
+    const parsedScore = Number(activeFilters.score)
+    if (!Number.isNaN(parsedScore) && parsedScore >= 0) {
+      params.append('min_score', parsedScore)
+    }
+  }
+
+  return params.toString()
+}
 
   const handleSearch = (event) => {
     event?.preventDefault()
+
+    // Require test type
+    if (!filters.testType.trim()) {
+      setErrorMessage('Please select a CLEP exam type.')
+      return
+    }
 
     if (filters.score !== '' && Number(filters.score) < 0) {
       setErrorMessage('Score cannot be negative.')
       return
     }
 
+    setErrorMessage('') // Clear any previous errors
     const queryString = buildQueryString(filters)
     navigate(`/results${queryString ? `?${queryString}` : ''}`)
   }
