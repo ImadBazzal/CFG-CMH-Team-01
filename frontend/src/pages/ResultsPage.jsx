@@ -370,7 +370,7 @@ const handleClepExamToggle = (exam) => {
       {/* REPORT BUTTON */}
       <button
         onClick={() => setShowReportForm(true)}
-        className="fixed bottom-6 right-6 z-30 bg-gradient-to-r from-[#ff6b8f] via-[#ff4d6d] to-[#f97bff] text-white px-6 py-3 rounded-full shadow-[0_15px_35px_rgba(255,107,143,0.35)] hover:shadow-[0_18px_38px_rgba(255,107,143,0.5)] transition-all font-semibold text-sm"
+        className="fixed bottom-6 right-6 z-30 inline-flex items-center gap-2 rounded-full border border-white/20 bg-gradient-to-r from-[#6f7dff] via-[#7f5dff] to-[#f97bff] px-7 py-3 text-white text-sm font-semibold tracking-wide shadow-[0_18px_45px_rgba(111,125,255,0.35)] backdrop-blur-xl transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_25px_55px_rgba(111,125,255,0.45)]"
       >
         Report Outdated Institution Information
       </button>

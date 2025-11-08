@@ -10,3 +10,17 @@
 .hide-scrollbar::-webkit-scrollbar {
 	display: none; /* Chrome, Safari, Opera */
 }
+
+.galaxy-map {
+	border-radius: 32px;
+	overflow: hidden;
+	background: radial-gradient(circle at 20% 20%, rgba(111, 125, 255, 0.15), transparent 60%),
+		radial-gradient(circle at 80% 0%, rgba(249, 123, 255, 0.15), transparent 55%),
+		linear-gradient(135deg, #030712, #050917);
+	box-shadow: 0 35px 65px rgba(3, 5, 15, 0.55);
+	border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.galaxy-map .leaflet-tile-pane {
+	filter: saturate(0.85) brightness(0.9) hue-rotate(-5deg);
+}
