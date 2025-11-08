@@ -29,7 +29,7 @@ const ResultsPage = () => {
       if (filters.city) params.append('city', filters.city);
       if (filters.state) params.append('state', filters.state);
       
-      // Replace with your actual backend URL
+      // Placeholder for backend url
       const response = await fetch(`http://localhost:8000/tests/search?${params}`);
       
       if (!response.ok) {
