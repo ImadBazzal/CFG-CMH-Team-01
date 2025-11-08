@@ -1,216 +1,321 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { MapPin, Filter } from 'lucide-react';
+import { useSearchParams } from 'react-router-dom';
 
-// Assuming FilterComponent and SchoolCard are defined in the same directory
 const ResultsPage = () => {
+  const [searchParams] = useSearchParams();
   const [selectedSchool, setSelectedSchool] = useState('');
+  const [schools, setSchools] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [filters, setFilters] = useState({
-    test: 'CLEP',
-    score: '50+',
+    clep_exam: searchParams.get('clep_exam') || '',
     city: '',
     state: '',
-    maxCost: ''
+    min_score: searchParams.get('min_score') || '',
+    maxCredits: '',
+    maxTranscriptionFee: ''
   });
 
-  // Example set of schools to display, with their id, name, and location
-  const schools = [
-    { id: 1, name: 'University of California, Berkeley', location: 'Berkeley, CA' },
-    { id: 2, name: 'Boston University', location: 'Boston, MA' },
-    { id: 3, name: 'University of Texas at Austin', location: 'Austin, TX' },
-    { id: 4, name: 'University of Michigan', location: 'Ann Arbor, MI' },
-    { id: 5, name: 'New York University', location: 'New York, NY' },
-    { id: 6, name: 'University of Washington', location: 'Seattle, WA' }
-  ];
+  // fetch schools from backend
+  useEffect(() => {
+    fetchSchools();
+  }, []);
 
-  // Reference changes based off values of key
-  const handleFilterChange = (key, value) => {
-    setFilters(prev => ({ ...prev, [key]: value }));
+  const fetchSchools = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      // build query params
+      const params = new URLSearchParams();
+      if (filters.city) params.append('city', filters.city);
+      if (filters.state) params.append('state', filters.state);
+      if (filters.clep_exam) params.append('clep_exam', filters.clep_exam);
+      if (filters.min_score) params.append('min_score', filters.min_score);
+
+      // Use correct backend API endpoint
+      const response = await fetch(`http://localhost:8000/api/tests/search?${params}`);
+      if (!response.ok) throw new Error('Failed to fetch schools');
+
+      const result = await response.json();
+
+      // ... rest of the function stays the same
+
+      // Transform backend data to match frontend structure
+      // Based on MS Sample SMALL table structure
+      const transformedSchools = result.data.map((school, index) => ({
+        id: school.id || index + 1,
+        name: school['School Name'] || 'Unknown School',
+        city: school.City || 'Unknown',
+        state: school.State || 'Unknown',
+        location: `${school.City || 'Unknown'}, ${school.State || 'Unknown'}`,
+        humanities: school.Humanities,
+        americanGovernment: school['American Government'],
+        diCode: school['DI Code'],
+        // fake coordinates for map placement
+        lat: 37 + Math.random() * 10,
+        lng: -95 + Math.random() * 20,
+      }));
+
+      // apply frontend filters
+      let filtered = transformedSchools;
+      if (filters.maxCredits)
+        filtered = filtered.filter((s) => s.maxCredits >= parseInt(filters.maxCredits));
+      if (filters.maxTranscriptionFee)
+        filtered = filtered.filter(
+          (s) => s.transcriptionFee <= parseInt(filters.maxTranscriptionFee)
+        );
+
+      setSchools(filtered);
+    } catch (err) {
+      console.error(err);
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
+  const handleFilterChange = (key, value) => setFilters((prev) => ({ ...prev, [key]: value }));
+
+  const handleApplyFilters = () => fetchSchools();
+
+  // UI
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
-      <div className="max-w-7xl mx-auto">
-        <h1 className="text-3xl font-bold text-gray-900 mb-6">School Search Results</h1>
-        
-        <div className="flex gap-6">
-          {/* filter section */}
-          <div className="w-80 flex-shrink-0">
-            <div className="bg-white rounded-lg border border-gray-200 shadow-lg p-4">
-              <div className="flex items-center gap-2 mb-4">
-                <Filter className="w-5 h-5 text-gray-700" />
-                <h2 className="font-semibold text-gray-900">Filters</h2>
-              </div>
-
-              <div className="space-y-4">
-                {/* test type */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Test Type
-                  </label>
-                  <select
-                    value={filters.test}
-                    onChange={(e) => handleFilterChange('test', e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  >
-                    <option value="SAT">SAT</option>
-                    <option value="ACT">ACT</option>
-                  </select>
-                </div>
-
-                {/* score */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Minimum Score
-                  </label>
-                  <select
-                    value={filters.score}
-                    onChange={(e) => handleFilterChange('score', e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  >
-                    <option value="1000+">1000+</option>
-                    <option value="1100+">1100+</option>
-                    <option value="1200+">1200+</option>
-                    <option value="1300+">1300+</option>
-                    <option value="1400+">1400+</option>
-                  </select>
-                </div>
-
-                {/* city */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    City
-                  </label>
-                  <input
-                    type="text"
-                    value={filters.city}
-                    onChange={(e) => handleFilterChange('city', e.target.value)}
-                    placeholder="e.g., Boston"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  />
-                </div>
-
-                {/* state */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    State
-                  </label>
-                  <select
-                    value={filters.state}
-                    onChange={(e) => handleFilterChange('state', e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  >
-                    <option value="">All States</option>
-                    <option value="CA">California</option>
-                    <option value="MA">Massachusetts</option>
-                    <option value="TX">Texas</option>
-                    <option value="MI">Michigan</option>
-                    <option value="NY">New York</option>
-                    <option value="WA">Washington</option>
-                  </select>
-                </div>
-
-                {/* max transcription fee */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Maximum Transcription Fee
-                  </label>
-                  <div className="relative">
-                    <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
-                      $
-                    </span>
-                    <input
-                      type="number"
-                      value={filters.maxCost}
-                      onChange={(e) => handleFilterChange('maxCost', e.target.value)}
-                      placeholder="5000"
-                      className="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    />
-                  </div>
-                </div>
-              </div>
+    <div className="relative w-screen h-screen overflow-hidden">
+      {/* MAP BACKGROUND */}
+      <div className="absolute inset-0 bg-gray-900">
+        <div className="w-full h-full flex items-center justify-center relative">
+          {/* subtle grid overlay */}
+          <div className="absolute inset-0 opacity-10">
+            <div className="grid grid-cols-12 grid-rows-8 h-full w-full">
+              {[...Array(96)].map((_, i) => (
+                <div key={i} className="border border-gray-700"></div>
+              ))}
             </div>
           </div>
 
-          
-          {/* MAP AND SCHOOL DROPDOWN */}
-          <div className="flex-1">
-            {/* school dropdown */}
-            <div className="mb-6">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Select a School
-              </label>
-              <select
-                value={selectedSchool}
-                onChange={(e) => setSelectedSchool(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base"
-              >
-                <option value="">Choose a school...</option>
-                {schools.map(school => (
-                  <option key={school.id} value={school.id}>
-                    {school.name} - {school.location}
-                  </option>
-                ))}
-              </select>
+          {/* map placeholder center text */}
+          <div className="relative z-10 text-center">
+            <MapPin className="w-16 h-16 text-gray-600 mx-auto mb-4" />
+            <p className="text-gray-400 text-lg font-medium">
+              {loading ? 'Loading CLEP Institutions...' : 'Interactive Map'}
+            </p>
+            <p className="text-gray-500 text-sm mt-2">
+              {schools.length
+                ? `${schools.length} schools found`
+                : loading
+                ? 'Fetching data from registrar directory...'
+                : 'No results — adjust filters'}
+            </p>
+          </div>
+
+          {/* dynamic map markers */}
+          {schools.slice(0, 20).map((school, index) => (
+            <div
+              key={school.id}
+              className="absolute w-6 h-6 bg-blue-600 rounded-full border-4 border-white shadow-lg cursor-pointer hover:bg-blue-700"
+              style={{
+                top: `${20 + (index * 11) % 60}%`,
+                left: `${25 + (index * 7) % 50}%`,
+              }}
+              title={school.name}
+              onClick={() => setSelectedSchool(school.id)}
+            />
+          ))}
+
+          {/* legend */}
+          <div className="absolute bottom-4 left-4 bg-white rounded-lg shadow-lg px-4 py-3 z-20">
+            <div className="flex items-center gap-2 text-sm">
+              <div className="w-3 h-3 bg-blue-600 rounded-full"></div>
+              <span className="text-gray-700 font-medium">Accepts CLEP Credit</span>
             </div>
 
-            {/* map */}
-            <div className="bg-gray-900 rounded-lg overflow-hidden" style={{ height: '600px' }}>
-              <div className="w-full h-full flex items-center justify-center relative">
-                {/* grid pattern */}
-                <div className="absolute inset-0 opacity-10">
-                  <div className="grid grid-cols-12 grid-rows-8 h-full w-full">
-                    {[...Array(96)].map((_, i) => (
-                      <div key={i} className="border border-gray-700"></div>
-                    ))}
-                  </div>
-                </div>
-                
-                {/* map placeholder content */}
-                <div className="relative z-10 text-center">
-                  <MapPin className="w-16 h-16 text-gray-600 mx-auto mb-4" />
-                  <p className="text-gray-400 text-lg font-medium">Interactive Map</p>
-                  <p className="text-gray-500 text-sm mt-2">School locations will appear here</p>
-                </div>
-
-                {/* map markers */}
-                <div className="absolute top-1/4 left-1/4 w-8 h-8 bg-blue-600 rounded-full border-4 border-white shadow-lg"></div>
-                <div className="absolute top-1/2 right-1/3 w-8 h-8 bg-blue-600 rounded-full border-4 border-white shadow-lg"></div>
-                <div className="absolute bottom-1/3 left-1/2 w-8 h-8 bg-blue-600 rounded-full border-4 border-white shadow-lg"></div>
-                
-                {/* map controls */}
-                <div className="absolute top-4 right-4 flex flex-col gap-2">
-                  <button className="w-10 h-10 bg-white rounded-lg shadow-lg flex items-center justify-center text-gray-700 hover:bg-gray-50 font-bold text-xl">
-                    +
-                  </button>
-                  <button className="w-10 h-10 bg-white rounded-lg shadow-lg flex items-center justify-center text-gray-700 hover:bg-gray-50 font-bold text-xl">
-                    −
-                  </button>
-                </div>
-
-                {/* map legend */}
-                <div className="absolute bottom-4 left-4 bg-white rounded-lg shadow-lg px-4 py-3">
-                  <div className="flex items-center gap-2 text-sm">
-                    <div className="w-3 h-3 bg-blue-600 rounded-full"></div>
-                    <span className="text-gray-700 font-medium">School Location</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* selected school info */}
-            {selectedSchool && (
-              <div className="mt-4 p-4 bg-white rounded-lg border border-gray-200">
-                <h3 className="font-semibold text-gray-900 mb-2">Selected School</h3>
-                <p className="text-gray-700">
-                  {schools.find(s => s.id === parseInt(selectedSchool))?.name}
-                </p>
-                <p className="text-gray-500 text-sm">
-                  {schools.find(s => s.id === parseInt(selectedSchool))?.location}
-                </p>
-              </div>
-            )}
           </div>
         </div>
+      </div>
+
+      {/* FILTER SIDEBAR */}
+      <div className="absolute top-6 left-6 z-30 w-80 bg-white/95 backdrop-blur-md rounded-xl border border-gray-200 shadow-lg p-5">
+        <div className="flex items-center gap-2 mb-4">
+          <Filter className="w-5 h-5 text-gray-700" />
+          <h2 className="font-semibold text-gray-900">Filters</h2>
+        </div>
+
+        <div className="space-y-4">
+          {/* CLEP exam */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">CLEP Exam Type</label>
+            <select
+              value={filters.clep_exam}
+              onChange={(e) => handleFilterChange('clep_exam', e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">All CLEP Exams</option>
+              <option value="Algebra">Algebra</option>
+              <option value="Humanities">Humanities</option>
+              <option value="American Government">American Government</option>
+              <option value="Biology">Biology</option>
+              <option value="Chemistry">Chemistry</option>
+              <option value="College Composition">College Composition</option>
+              <option value="History of the United States">History of the United States</option>
+              <option value="Principles of Management">Principles of Management</option>
+              <option value="Spanish">Spanish</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+
+         {/* min score */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Minimum CLEP Score
+          </label>
+          <input
+            type="number"
+            value={filters.min_score}
+            onChange={(e) => handleFilterChange('min_score', e.target.value)}
+            placeholder="e.g. 50"
+            min="20"
+            max="80"
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+
+          {/* city */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">City</label>
+            <input
+              type="text"
+              value={filters.city}
+              onChange={(e) => handleFilterChange('city', e.target.value)}
+              placeholder="e.g. Boston"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+
+          {/* state */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">State</label>
+            <select
+              value={filters.state}
+              onChange={(e) => handleFilterChange('state', e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">All States</option>
+              <option value="CA">California</option>
+              <option value="FL">Florida</option>
+              <option value="NY">New York</option>
+              <option value="TX">Texas</option>
+              <option value="OH">Ohio</option>
+            </select>
+          </div>
+
+          {/* max fee */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Max Transcription Fee
+            </label>
+            <div className="relative">
+              <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">$</span>
+              <input
+                type="number"
+                value={filters.maxTranscriptionFee}
+                onChange={(e) => handleFilterChange('maxTranscriptionFee', e.target.value)}
+                placeholder="100"
+                className="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+          </div>
+
+          <button
+            onClick={handleApplyFilters}
+            className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors font-medium"
+          >
+            Apply Filters
+          </button>
+        </div>
+      </div>
+
+      {/* SCHOOL DROPDOWN */}
+      <div className="absolute top-6 right-6 z-30 w-96 bg-white/95 backdrop-blur-md rounded-xl border border-gray-200 shadow-lg p-5">
+        <label className="block text-sm font-medium text-gray-700 mb-2">Select a School</label>
+        <select
+          value={selectedSchool}
+          onChange={(e) => setSelectedSchool(e.target.value)}
+          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-base"
+          disabled={loading}
+        >
+          <option value="">
+            {loading ? 'Loading schools...' : 'Choose a school...'}
+          </option>
+          {schools.map((school) => (
+            <option key={school.id} value={school.id}>
+              {school.name} — {school.location}
+            </option>
+          ))}
+        </select>
+
+        {selectedSchool && (
+          <div className="mt-4 bg-white rounded-lg border border-gray-200 p-4 text-sm">
+            {(() => {
+              const school = schools.find((s) => s.id === selectedSchool);
+              if (!school) return null;
+              return (
+                <>
+                  <h3 className="font-semibold text-gray-900 mb-2">{school.name}</h3>
+                  <p className="text-gray-700">{school.location}</p>
+                  <p className="text-gray-500 mt-2">
+                    Enrollment: {school.enrollment?.toLocaleString() || 'N/A'}
+                  </p>
+                  <p className="text-gray-500">
+                    Max CLEP Credits: {school.maxCredits || 'N/A'}
+                  </p>
+                  <p className="text-gray-500">
+                    Transcription Fee: ${school.transcriptionFee || 'N/A'}
+                  </p>
+                  <p className="text-gray-500">
+                    Score Validity: {school.scoreValidity || 'N/A'} years
+                  </p>
+                  <div className="flex justify-between items-center mt-2">
+                    <span className="text-gray-600 text-sm">Enrolled Students Can Use:</span>
+                    <span
+                      className={`px-2 py-1 rounded text-xs font-medium ${
+                        school.canEnrolledStudentsUseCLEP
+                          ? 'bg-green-100 text-green-800'
+                          : 'bg-red-100 text-red-800'
+                      }`}
+                    >
+                      {school.canEnrolledStudentsUseCLEP ? 'Yes' : 'No'}
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center mt-1">
+                    <span className="text-gray-600 text-sm">Use for Failed Courses:</span>
+                    <span
+                      className={`px-2 py-1 rounded text-xs font-medium ${
+                        school.canUseForFailedCourses
+                          ? 'bg-green-100 text-green-800'
+                          : 'bg-red-100 text-red-800'
+                      }`}
+                    >
+                      {school.canUseForFailedCourses ? 'Yes' : 'No'}
+                    </span>
+                  </div>
+
+                  {school.clepWebUrl && (
+                    <a
+                      href={school.clepWebUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-600 hover:text-blue-800 text-sm font-medium mt-3 inline-block"
+                    >
+                      View CLEP Policy →
+                    </a>
+                  )}
+                </>
+              );
+            })()}
+          </div>
+        )}
       </div>
     </div>
   );
