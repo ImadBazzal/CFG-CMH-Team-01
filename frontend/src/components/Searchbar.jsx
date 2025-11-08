@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 const DEFAULT_API_BASE_URL =
-  import.meta?.env?.VITE_API_BASE_URL?.replace(/\/$/, '') ?? 'http://localhost:8000'
+  import.meta?.env?.VITE_API_BASE_URL?.replace(/\/$/, '') ?? 'http://localhost:8000/api'
 
 const initialFilters = {
   testType: '',
@@ -11,6 +11,8 @@ const initialFilters = {
 
 const testOptions = [
   'Algebra',
+  'Humanities',
+  'American Government',
   'Biology',
   'Chemistry',
   'College Composition',
@@ -40,8 +42,11 @@ const Searchbar = ({ apiBaseUrl = DEFAULT_API_BASE_URL }) => {
     if (activeFilters.score !== '') {
       const parsedScore = Number(activeFilters.score)
       if (!Number.isNaN(parsedScore)) {
-        params.append('min_score', parsedScore)
-        params.append('max_score', parsedScore)
+        if (activeFilters.testType === 'Humanities') {
+          params.append('min_humanities', parsedScore)
+        } else if (activeFilters.testType === 'American Government') {
+          params.append('min_american_government', parsedScore)
+        }
       }
     }
 
