@@ -1,6 +1,39 @@
 import React, { useMemo, useState } from 'react'
+import { Plus, Trash2, Edit2, Check, X } from 'lucide-react'
 
-// these are placeholder questions that we'd ask university registar affiliates 
+// CLEP exam list for reference
+const clepExams = [
+  'American Government',
+  'American Literature',
+  'Analyzing & Interpreting Literature',
+  'Biology',
+  'Calculus',
+  'Chemistry',
+  'College Algebra',
+  'College Composition',
+  'College Mathematics',
+  'English Literature',
+  'Financial Accounting',
+  'French Language',
+  'German Language',
+  'History of the United States I',
+  'History of the United States II',
+  'Human Growth and Development',
+  'Information Systems',
+  'Introductory Business Law',
+  'Introductory Psychology',
+  'Introductory Sociology',
+  'Natural Sciences',
+  'Precalculus',
+  'Principles of Macroeconomics',
+  'Principles of Microeconomics',
+  'Principles of Management',
+  'Principles of Marketing',
+  'Spanish Language',
+  'Western Civilization I',
+  'Western Civilization II'
+]
+
 const prompts = [
   {
     theme: 'Authorization',
@@ -39,13 +72,31 @@ const prompts = [
     hints: ['Cross-campus', 'Sign-off needed']
   },
   {
-    theme: 'Maintenance',
+    theme: 'Contact Information',
     question:
-      'Who is the current point of contact for CLEP credit policy updates this semester?',
+      'Who should students and advisors contact with questions about CLEP credit transfer policies?',
     description:
-      'Assign a primary contact to ensure any questions or discrepancies about your CLEP listings reach the right person.',
-    badge: 'Contact unassigned',
-    hints: ['Registrar staff', 'Update responsibility']
+      'Provide the best contact point for CLEP-related inquiries to ensure accurate information reaches students.',
+    badge: 'Contact updated',
+    hints: ['Registrar email', 'Phone support']
+  },
+  {
+    theme: 'Credit Details',
+    question:
+      'How many credit hours does your institution typically award for each accepted CLEP exam?',
+    description:
+      'Specify credit hour values to help students understand the academic value of each exam they complete.',
+    badge: '3-6 credits per exam',
+    hints: ['Credit hours', 'Course equivalencies']
+  },
+  {
+    theme: 'Update & Review',
+    question:
+      'Would you like to add, update, or review your institution\'s CLEP acceptance data now?',
+    description:
+      'Make changes to your CLEP policies, add new exam acceptances, or update existing score requirements.',
+    badge: 'Ready to edit',
+    hints: ['Add exams', 'Update scores']
   }
 ]
 
@@ -53,10 +104,51 @@ const RegistarPage = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [email, setEmail] = useState('')
   const [currentPrompt, setCurrentPrompt] = useState(0)
+  const [showDataEntry, setShowDataEntry] = useState(false)
+  const [editingIndex, setEditingIndex] = useState(null)
+  
+  // mock existing data
+  const [clepPolicies, setClepPolicies] = useState([
+    {
+      exam: 'American Government',
+      minScore: 50,
+      credits: 3,
+      courseEquivalent: 'POLS 101',
+      department: 'Political Science'
+    },
+    {
+      exam: 'Biology',
+      minScore: 50,
+      credits: 4,
+      courseEquivalent: 'BIO 101',
+      department: 'Natural Sciences'
+    },
+    {
+      exam: 'Calculus',
+      minScore: 50,
+      credits: 4,
+      courseEquivalent: 'MATH 201',
+      department: 'Mathematics'
+    }
+  ])
+
+  // form state for new/editing entry
+  const [formData, setFormData] = useState({
+    exam: '',
+    minScore: 50,
+    credits: 3,
+    courseEquivalent: '',
+    department: ''
+  })
+
   const activePrompt = useMemo(() => prompts[currentPrompt], [currentPrompt])
 
   const advancePrompt = () => {
-    setCurrentPrompt((prev) => (prev + 1) % prompts.length)
+    if (currentPrompt === prompts.length - 1) {
+      setShowDataEntry(true)
+    } else {
+      setCurrentPrompt((prev) => prev + 1)
+    }
   }
 
   const handleLogin = () => {
@@ -71,6 +163,57 @@ const RegistarPage = () => {
     }
   }
 
+  const handleAddPolicy = () => {
+    if (formData.exam && formData.courseEquivalent && formData.department) {
+      if (editingIndex !== null) {
+        // update existing
+        const updated = [...clepPolicies]
+        updated[editingIndex] = formData
+        setClepPolicies(updated)
+        setEditingIndex(null)
+      } else {
+        // add new
+        setClepPolicies([...clepPolicies, formData])
+      }
+      // reset form
+      setFormData({
+        exam: '',
+        minScore: 50,
+        credits: 3,
+        courseEquivalent: '',
+        department: ''
+      })
+    }
+  }
+
+  const handleEdit = (index) => {
+    setFormData(clepPolicies[index])
+    setEditingIndex(index)
+  }
+
+  const handleDelete = (index) => {
+    setClepPolicies(clepPolicies.filter((_, i) => i !== index))
+  }
+
+  const handleCancelEdit = () => {
+    setFormData({
+      exam: '',
+      minScore: 50,
+      credits: 3,
+      courseEquivalent: '',
+      department: ''
+    })
+    setEditingIndex(null)
+  }
+
+  const handleSaveAll = () => {
+    // mock save functionality
+    alert(`Successfully saved ${clepPolicies.length} CLEP policies for your institution!`)
+    setShowDataEntry(false)
+    setCurrentPrompt(0)
+  }
+
+  // login Screen
   if (!isLoggedIn) {
     return (
       <main className="relative flex min-h-screen w-full items-center justify-center overflow-hidden bg-[radial-gradient(circle_at_15%_20%,rgba(71,134,255,0.25),transparent_45%),radial-gradient(circle_at_80%_10%,rgba(255,86,180,0.25),transparent_40%),linear-gradient(135deg,#030712,#020310_55%,#050917)] px-4 py-10 sm:px-6 lg:px-12">
@@ -81,13 +224,13 @@ const RegistarPage = () => {
         <section className="relative z-10 w-full max-w-md rounded-[32px] border border-white/10 bg-gradient-to-br from-[#070916]/90 to-[#070b20]/70 p-6 sm:p-10 lg:p-14 shadow-panel backdrop-blur-3xl">
           <header className="text-center">
             <p className="text-xs font-semibold uppercase tracking-[0.24em] text-white/60">
-              CREP acceptance pulse
+              CLEP acceptance pulse
             </p>
             <h1 className="mt-3 text-3xl font-semibold text-white sm:text-[2.4rem]">
               Registrar console
             </h1>
             <p className="mt-3 text-base text-white/70">
-              Sign in to manage your institution's CREP acceptance status.
+              Sign in to manage your institution's CLEP acceptance status.
             </p>
           </header>
 
@@ -123,6 +266,202 @@ const RegistarPage = () => {
     )
   }
 
+  // data entry screen
+  if (showDataEntry) {
+    return (
+      <main className="relative flex min-h-screen w-full items-center justify-center overflow-hidden bg-[radial-gradient(circle_at_15%_20%,rgba(71,134,255,0.25),transparent_45%),radial-gradient(circle_at_80%_10%,rgba(255,86,180,0.25),transparent_40%),linear-gradient(135deg,#030712,#020310_55%,#050917)] px-4 py-10 sm:px-6 lg:px-12">
+        <div
+          className="pointer-events-none absolute -right-[10%] -top-[25%] h-[60vw] w-[60vw] rounded-full bg-[radial-gradient(circle,rgba(80,120,255,0.3),transparent_60%)] blur-[8px]"
+          aria-hidden="true"
+        />
+        <section className="relative z-10 w-full max-w-6xl rounded-[32px] border border-white/10 bg-gradient-to-br from-[#070916]/90 to-[#070b20]/70 p-6 sm:p-10 lg:p-14 shadow-panel backdrop-blur-3xl">
+          <header className="mb-8">
+            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-white/60">
+              CLEP Policy Management
+            </p>
+            <h1 className="mt-3 text-3xl font-semibold text-white sm:text-[2.4rem]">
+              Update Your CLEP Acceptance Data
+            </h1>
+            <p className="mt-3 text-base text-white/70">
+              Add, edit, or remove CLEP exam policies for your institution.
+            </p>
+          </header>
+
+          {/* add/edit form */}
+          <div className="mb-8 rounded-2xl border border-white/10 bg-white/5 p-6">
+            <h2 className="text-lg font-semibold text-white mb-4">
+              {editingIndex !== null ? 'Edit CLEP Policy' : 'Add New CLEP Policy'}
+            </h2>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-semibold text-white/80 mb-2">
+                  CLEP Exam
+                </label>
+                <select
+                  value={formData.exam}
+                  onChange={(e) => setFormData({ ...formData, exam: e.target.value })}
+                  className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-white focus:border-white/30 focus:bg-white/10 focus:outline-none"
+                >
+                  <option value="">Select exam...</option>
+                  {clepExams.map(exam => (
+                    <option key={exam} value={exam} className="bg-gray-900">{exam}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-white/80 mb-2">
+                  Minimum Score
+                </label>
+                <input
+                  type="number"
+                  value={formData.minScore}
+                  onChange={(e) => setFormData({ ...formData, minScore: parseInt(e.target.value) })}
+                  min="20"
+                  max="80"
+                  className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-white focus:border-white/30 focus:bg-white/10 focus:outline-none"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-white/80 mb-2">
+                  Credit Hours
+                </label>
+                <input
+                  type="number"
+                  value={formData.credits}
+                  onChange={(e) => setFormData({ ...formData, credits: parseInt(e.target.value) })}
+                  min="1"
+                  max="12"
+                  className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-white focus:border-white/30 focus:bg-white/10 focus:outline-none"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-white/80 mb-2">
+                  Course Equivalent
+                </label>
+                <input
+                  type="text"
+                  value={formData.courseEquivalent}
+                  onChange={(e) => setFormData({ ...formData, courseEquivalent: e.target.value })}
+                  placeholder="e.g., MATH 201"
+                  className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-white placeholder-white/40 focus:border-white/30 focus:bg-white/10 focus:outline-none"
+                />
+              </div>
+
+              <div className="md:col-span-2">
+                <label className="block text-sm font-semibold text-white/80 mb-2">
+                  Department
+                </label>
+                <input
+                  type="text"
+                  value={formData.department}
+                  onChange={(e) => setFormData({ ...formData, department: e.target.value })}
+                  placeholder="e.g., Mathematics"
+                  className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-white placeholder-white/40 focus:border-white/30 focus:bg-white/10 focus:outline-none"
+                />
+              </div>
+            </div>
+
+            <div className="flex gap-3 mt-4">
+              <button
+                onClick={handleAddPolicy}
+                className="flex items-center gap-2 rounded-full bg-gradient-to-r from-[#6f7dff] to-[#5ecfff] px-6 py-2.5 text-sm font-semibold text-[#020308] shadow-[0_8px_20px_rgba(94,207,255,0.25)] transition hover:-translate-y-0.5"
+              >
+                {editingIndex !== null ? (
+                  <>
+                    <Check className="w-4 h-4" />
+                    Update Policy
+                  </>
+                ) : (
+                  <>
+                    <Plus className="w-4 h-4" />
+                    Add Policy
+                  </>
+                )}
+              </button>
+              
+              {editingIndex !== null && (
+                <button
+                  onClick={handleCancelEdit}
+                  className="flex items-center gap-2 rounded-full bg-white/10 px-6 py-2.5 text-sm font-semibold text-white/80 transition hover:bg-white/20"
+                >
+                  <X className="w-4 h-4" />
+                  Cancel
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* current policies list */}
+          <div className="mb-8">
+            <h2 className="text-lg font-semibold text-white mb-4">
+              Current CLEP Policies ({clepPolicies.length})
+            </h2>
+            
+            <div className="space-y-3 max-h-96 overflow-y-auto">
+              {clepPolicies.map((policy, index) => (
+                <div
+                  key={index}
+                  className="rounded-xl border border-white/10 bg-white/5 p-4 flex items-center justify-between"
+                >
+                  <div className="flex-1">
+                    <div className="flex items-center gap-3 mb-2">
+                      <h3 className="font-semibold text-white">{policy.exam}</h3>
+                      <span className="rounded-full bg-blue-300/15 px-3 py-0.5 text-xs text-blue-50/80">
+                        Min Score: {policy.minScore}
+                      </span>
+                      <span className="rounded-full bg-purple-300/15 px-3 py-0.5 text-xs text-purple-50/80">
+                        {policy.credits} credits
+                      </span>
+                    </div>
+                    <p className="text-sm text-white/70">
+                      {policy.courseEquivalent} • {policy.department}
+                    </p>
+                  </div>
+                  
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => handleEdit(index)}
+                      className="rounded-lg bg-white/10 p-2 text-white/80 transition hover:bg-white/20"
+                    >
+                      <Edit2 className="w-4 h-4" />
+                    </button>
+                    <button
+                      onClick={() => handleDelete(index)}
+                      className="rounded-lg bg-red-500/20 p-2 text-red-200 transition hover:bg-red-500/30"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* action buttons */}
+          <div className="flex flex-wrap justify-end gap-3">
+            <button
+              onClick={() => setShowDataEntry(false)}
+              className="rounded-full bg-white/10 px-6 py-3 text-sm font-semibold text-white/80 transition hover:bg-white/20"
+            >
+              Back to Questions
+            </button>
+            <button
+              onClick={handleSaveAll}
+              className="rounded-full bg-gradient-to-r from-[#6f7dff] to-[#5ecfff] px-6 py-3 text-sm font-semibold text-[#020308] shadow-[0_12px_25px_rgba(94,207,255,0.25)] transition hover:-translate-y-0.5 hover:shadow-[0_18px_35px_rgba(94,207,255,0.35)]"
+            >
+              Save All Changes
+            </button>
+          </div>
+        </section>
+      </main>
+    )
+  }
+
+  // -------QUESTIONNAIRE SCREEN---------
   return (
     <main className="relative flex min-h-screen w-full items-center justify-center overflow-hidden bg-[radial-gradient(circle_at_15%_20%,rgba(71,134,255,0.25),transparent_45%),radial-gradient(circle_at_80%_10%,rgba(255,86,180,0.25),transparent_40%),linear-gradient(135deg,#030712,#020310_55%,#050917)] px-4 py-10 sm:px-6 lg:px-12">
       <div
@@ -133,13 +472,13 @@ const RegistarPage = () => {
         <header className="flex flex-wrap items-start justify-between gap-6">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.24em] text-white/60">
-              CREP acceptance pulse
+              CLEP acceptance pulse
             </p>
             <h1 className="mt-3 text-3xl font-semibold text-white sm:text-[2.4rem]">
               Registrar console
             </h1>
             <p className="mt-3 max-w-xl text-base text-white/70">
-              Manage your institution's CREP acceptance status one step at a time.
+              Manage your institution's CLEP acceptance status one step at a time.
             </p>
           </div>
           <div className="rounded-2xl border border-white/10 bg-white/5 px-6 py-4 text-center text-sm text-white/80">
@@ -199,14 +538,14 @@ const RegistarPage = () => {
             className="w-full rounded-full bg-white/10 px-6 py-3 text-sm font-semibold text-white/80 transition hover:bg-white/20 sm:w-auto"
             onClick={advancePrompt}
           >
-            Remind me later
+            {currentPrompt === prompts.length - 1 ? 'Skip for now' : 'Remind me later'}
           </button>
           <button
             type="button"
             className="w-full rounded-full bg-gradient-to-r from-[#6f7dff] to-[#5ecfff] px-6 py-3 text-sm font-semibold text-[#020308] shadow-[0_12px_25px_rgba(94,207,255,0.25)] transition hover:-translate-y-0.5 hover:shadow-[0_18px_35px_rgba(94,207,255,0.35)] sm:w-auto"
             onClick={advancePrompt}
           >
-            Next question
+            {currentPrompt === prompts.length - 1 ? 'Update Policies' : 'Next question'}
           </button>
         </div>
       </section>
