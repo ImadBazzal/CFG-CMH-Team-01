@@ -34,28 +34,25 @@ const ResultsPage = () => {
       if (filters.clep_exam) params.append('clep_exam', filters.clep_exam);
       if (filters.min_score) params.append('min_score', filters.min_score);
 
-      const response = await fetch(`http://localhost:8000/tests/search?${params}`);
+      // Use correct backend API endpoint
+      const response = await fetch(`http://localhost:8000/api/tests/search?${params}`);
       if (!response.ok) throw new Error('Failed to fetch schools');
 
       const result = await response.json();
 
       // ... rest of the function stays the same
 
-      // transform backend data into front-end shape
-      const transformedSchools = result.data.map((institution, i) => ({
-        id: institution['MSEA Org ID'] || i,
-        name: institution.Name,
-        city: institution.City,
-        state: institution.State,
-        zip: institution.Zip,
-        location: `${institution.City}, ${institution.State}`,
-        enrollment: institution.Enrollment,
-        maxCredits: institution['Max Credits'],
-        transcriptionFee: institution['Transcription Fee'],
-        canUseForFailedCourses: institution['Can Use For Failed Courses'],
-        canEnrolledStudentsUseCLEP: institution['Can Enrolled Students Use CLEP'],
-        scoreValidity: institution['Score Validity (years)'],
-        clepWebUrl: institution['CLEP Web URL'],
+      // Transform backend data to match frontend structure
+      // Based on MS Sample SMALL table structure
+      const transformedSchools = result.data.map((school, index) => ({
+        id: school.id || index + 1,
+        name: school['School Name'] || 'Unknown School',
+        city: school.City || 'Unknown',
+        state: school.State || 'Unknown',
+        location: `${school.City || 'Unknown'}, ${school.State || 'Unknown'}`,
+        humanities: school.Humanities,
+        americanGovernment: school['American Government'],
+        diCode: school['DI Code'],
         // fake coordinates for map placement
         lat: 37 + Math.random() * 10,
         lng: -95 + Math.random() * 20,
@@ -133,6 +130,7 @@ const ResultsPage = () => {
               <div className="w-3 h-3 bg-blue-600 rounded-full"></div>
               <span className="text-gray-700 font-medium">Accepts CLEP Credit</span>
             </div>
+
           </div>
         </div>
       </div>
