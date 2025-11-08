@@ -24,46 +24,19 @@ const ResultsPage = () => {
   };
 
   const [filters, setFilters] = useState({
-    clep_exam: getDecodedParam('clep_exam'),
-    city: '',
-    state: '',
-    min_score: getDecodedParam('min_score'),
-    maxCredits: '',
-    maxTranscriptionFee: ''
-  });
-
-
-
-
-
-
+  clep_exam: getDecodedParam('clep_exam') ? [getDecodedParam('clep_exam')] : [],
+  city: '',
+  state: '',
+  min_score: getDecodedParam('min_score'),
+  maxCredits: '',
+  maxTranscriptionFee: ''
+});
 
 const [showReportForm, setShowReportForm] = useState(false);
 const [reportData, setReportData] = useState({
   institutionName: '',
   clepExams: []
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
   // fetch schools from backend
   useEffect(() => {
@@ -183,6 +156,15 @@ const [reportData, setReportData] = useState({
   }
 };
 
+const handleClepExamFilterToggle = (exam) => {
+  setFilters(prev => ({
+    ...prev,
+    clep_exam: prev.clep_exam.includes(exam)
+      ? prev.clep_exam.filter(e => e !== exam)
+      : [...prev.clep_exam, exam]
+  }));
+};
+
 const handleClepExamToggle = (exam) => {
   setReportData(prev => ({
     ...prev,
@@ -241,46 +223,57 @@ const handleClepExamToggle = (exam) => {
         </div>
 
         <div className="space-y-4">
-          {/* CLEP exam */}
-          <div>
-            <label className="block text-sm font-medium text-white/80 mb-1">CLEP Exam Type</label>
-            <select
-              value={filters.clep_exam}
-              onChange={(e) => handleFilterChange('clep_exam', e.target.value)}
-              className="w-full px-3 py-2 bg-gray-800 border border-white/15 rounded-xl text-white placeholder-white/40 focus:ring-2 focus:ring-[#6f7dff]/60 focus:border-[#6f7dff]/80"
-            >
-              <option value="">All CLEP Exams</option>
-              <option value="American Government">American Government</option>
-              <option value="American Literature">American Literature</option>
-              <option value="Analyzing & Interpreting Literature">Analyzing & Interpreting Literature</option>
-              <option value="Biology">Biology</option>
-              <option value="Calculus">Calculus</option>
-              <option value="Chemistry">Chemistry</option>
-              <option value="College Algebra">College Algebra</option>
-              <option value="College Composition">College Composition</option>
-              <option value="College Mathematics">College Mathematics</option>
-              <option value="English Literature">English Literature</option>
-              <option value="Financial Accounting">Financial Accounting</option>
-              <option value="French Language">French Language</option>
-              <option value="German Language">German Language</option>
-              <option value="History of the United States I">History of the United States I</option>
-              <option value="History of the United States II">History of the United States II</option>
-              <option value="Human Growth and Development">Human Growth and Development</option>
-              <option value="Information Systems">Information Systems</option>
-              <option value="Introductory Business Law">Introductory Business Law</option>
-              <option value="Introductory Psychology">Introductory Psychology</option>
-              <option value="Introductory Sociology">Introductory Sociology</option>
-              <option value="Natural Sciences">Natural Sciences</option>
-              <option value="Precalculus">Precalculus</option>
-              <option value="Principles of Macroeconomics">Principles of Macroeconomics</option>
-              <option value="Principles of Microeconomics">Principles of Microeconomics</option>
-              <option value="Principles of Management">Principles of Management</option>
-              <option value="Principles of Marketing">Principles of Marketing</option>
-              <option value="Spanish Language">Spanish Language</option>
-              <option value="Western Civilization I">Western Civilization I</option>
-              <option value="Western Civilization II">Western Civilization II</option>
-            </select>
+          
+        {/* CLEP exam */}
+        <div>
+          <label className="block text-sm font-medium text-white/80 mb-2">CLEP Exam Type (select all that apply)</label>
+          <div className="border border-white/10 rounded-xl max-h-48 overflow-y-auto p-3 space-y-2 bg-white/5">
+            {[
+              'American Government',
+              'American Literature',
+              'Analyzing & Interpreting Literature',
+              'Biology',
+              'Calculus',
+              'Chemistry',
+              'College Algebra',
+              'College Composition',
+              'College Mathematics',
+              'English Literature',
+              'Financial Accounting',
+              'French Language',
+              'German Language',
+              'History of the United States I',
+              'History of the United States II',
+              'Human Growth and Development',
+              'Information Systems',
+              'Introductory Business Law',
+              'Introductory Psychology',
+              'Introductory Sociology',
+              'Natural Sciences',
+              'Precalculus',
+              'Principles of Macroeconomics',
+              'Principles of Microeconomics',
+              'Principles of Management',
+              'Principles of Marketing',
+              'Spanish Language',
+              'Western Civilization I',
+              'Western Civilization II'
+            ].map((exam) => (
+              <label key={exam} className="flex items-center space-x-2 cursor-pointer rounded-xl px-2 py-1 text-white/80 hover:bg-white/10">
+                <input
+                  type="checkbox"
+                  checked={filters.clep_exam.includes(exam)}
+                  onChange={() => handleClepExamFilterToggle(exam)}
+                  className="w-4 h-4 text-[#6f7dff] border-white/20 rounded focus:ring-[#6f7dff]"
+                />
+                <span className="text-sm">{exam}</span>
+              </label>
+            ))}
           </div>
+          <p className="text-xs text-white/60 mt-1">
+            {filters.clep_exam.length > 0 ? `${filters.clep_exam.length} exam(s) selected` : 'No exams selected'}
+          </p>
+        </div>
 
          {/* min score */}
         <div>
