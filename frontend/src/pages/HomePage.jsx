@@ -8,13 +8,19 @@ const HomePage = () => {
         className="pointer-events-none absolute -right-[10%] -top-[25%] h-[60vw] w-[60vw] rounded-full bg-[radial-gradient(circle,rgba(80,120,255,0.3),transparent_60%)] blur-[8px]"
         aria-hidden="true"
       />
-      
-      {/* Content */}
+
+      {/* content */}
       <div className="relative z-10 w-full max-w-4xl text-center">
         <section className="space-y-3 max-w-2xl mx-auto">
-          <h1 className="text-3xl font-semibold text-white md:text-[2.75rem]">
+          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-white/60">
+            Modern States
+          </p>
+          <h1 className="mt-3 text-3xl font-semibold text-white sm:text-[2.4rem]">
             CLEP Acceptance Tool
           </h1>
+          <p className="mt-3 text-base text-white/70">
+            Search for institutions accepting CLEP credit
+          </p>
         </section>
 
         <div className="mt-8 w-full">
