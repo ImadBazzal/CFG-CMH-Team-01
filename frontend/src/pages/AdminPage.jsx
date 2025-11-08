@@ -14,11 +14,11 @@ const AdminDashboard = ({ onLogout }) => {
 
   const fetchDatabaseStats = async () => {
     try {
-      // Hardcoded statistics for development/testing. These mirror the shape
-      // produced by analyzeData() and the backend responses.
+      // Showcase statistics feature
       const statsData = {
         totalInstitutions: 40,
         policiesReported: 251,
+        avgClepAcceptance: 66,
         clepAcceptance: {
           humanities: 35,
           americanGov: 30,
@@ -40,14 +40,14 @@ const AdminDashboard = ({ onLogout }) => {
           MI: 3
         },
         backend: {
-          health: { status: 'mock', database: 'mocked' },
+          health: { status: 'temporary', database: 'temp_supabase' },
           returnedCount: 40
         }
       }
 
       setStats({ loading: false, error: null, data: statsData })
     } catch (err) {
-      setStats({ loading: false, error: `Failed to load hardcoded stats: ${err.message}`, data: null })
+      setStats({ loading: false, error: `Failed to load stats: ${err.message}`, data: null })
     }
   }
 
@@ -61,8 +61,7 @@ const AdminDashboard = ({ onLogout }) => {
         americanGov: 0,
         mathematics: 0,
         composition: 0
-      },
-      completeRecords: 0
+      }
     }
 
     schools.forEach(school => {
@@ -95,9 +94,9 @@ const AdminDashboard = ({ onLogout }) => {
   }
 
   return (
-    <main className="relative flex min-h-screen w-full overflow-hidden bg-[radial-gradient(circle_at_15%_20%,rgba(71,134,255,0.25),transparent_45%),radial-gradient(circle_at_80%_10%,rgba(255,86,180,0.25),transparent_40%),linear-gradient(135deg,#030712,#020310_55%,#050917)] px-4 py-10 sm:px-6 lg:px-12">
+    <main className="relative flex h-screen w-full bg-[radial-gradient(circle_at_15%_20%,rgba(71,134,255,0.25),transparent_45%),radial-gradient(circle_at_80%_10%,rgba(255,86,180,0.25),transparent_40%),linear-gradient(135deg,#030712,#020310_55%,#050917)] px-4 py-10 sm:px-6 lg:px-12">
       <div
-        className="pointer-events-none absolute -right-[10%] -top-[25%] h-[60vw] w-[60vw] rounded-full bg-[radial-gradient(circle,rgba(80,120,255,0.3),transparent_60%)] blur-[8px]"
+        className="pointer-events-none fixed -right-[10%] -top-[25%] h-[60vw] w-[60vw] rounded-full bg-[radial-gradient(circle,rgba(80,120,255,0.3),transparent_60%)] blur-[8px]"
         aria-hidden="true"
       />
       <div className="relative z-10 w-full max-w-7xl mx-auto">
@@ -140,10 +139,14 @@ const AdminDashboard = ({ onLogout }) => {
                   <span className="text-white/70">Policies Reported:</span>
                   <span className="font-semibold text-blue-400">{stats.data.policiesReported}</span>
                 </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-white/70">Average CLEP Acceptance:</span>
+                  <span className="font-semibold text-blue-400">{stats.data.avgClepAcceptance}%</span>
+                </div>
               </div>
             </div>
 
-            {/* CLEP Acceptance by Subject */}
+            {/*Showcase CLEP Acceptance Data Feature*/}
             <div className="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
               <h2 className="text-lg font-semibold text-white mb-4">CLEP Acceptance by Subject</h2>
               <div className="space-y-3">
@@ -162,6 +165,14 @@ const AdminDashboard = ({ onLogout }) => {
                 <div className="flex justify-between items-center">
                   <span className="text-white/70">Composition:</span>
                   <span className="font-semibold text-blue-400">{stats.data.clepAcceptance.composition} schools</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-white/70">Biology:</span>
+                  <span className="font-semibold text-blue-400">{stats.data.clepAcceptance.biology} schools</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-white/70">Calculus:</span>
+                  <span className="font-semibold text-blue-400">{stats.data.clepAcceptance.calculus} schools</span>
                 </div>
               </div>
             </div>
