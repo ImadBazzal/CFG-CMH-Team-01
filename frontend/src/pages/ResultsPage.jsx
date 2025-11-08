@@ -1,94 +1,90 @@
 import React, { useState, useEffect } from 'react';
 import { MapPin, Filter } from 'lucide-react';
-import { useSearchParams } from 'react-router-dom';
+import mapboxgl from 'mapbox-gl';
+import 'mapbox-gl/dist/mapbox-gl.css';
+
+mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN;
 
 const ResultsPage = () => {
-  const [searchParams] = useSearchParams();
-  const [selectedSchool, setSelectedSchool] = useState('');
-  const [schools, setSchools] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  // Helper function to decode HTML entities in URL params
-  const getDecodedParam = (param) => {
-    const value = searchParams.get(param);
-    if (!value) return '';
-    // Decode HTML entities like &amp; to &
-    const textarea = document.createElement('textarea');
-    textarea.innerHTML = value;
-    return textarea.value;
-  };
 
-  const [filters, setFilters] = useState({
-    clep_exam: getDecodedParam('clep_exam'),
-    city: '',
-    state: '',
-    min_score: getDecodedParam('min_score'),
-    maxCredits: '',
-    maxTranscriptionFee: ''
-  });
+  // MAPBOX INTEGRATION
 
-const [showReportForm, setShowReportForm] = useState(false);
-const [reportData, setReportData] = useState({
-  institutionName: '',
-  clepExams: []
-});
+  const mapContainerRef = React.createRef(null);
+  const mapRef = React.useRef(null);
+
+  useEffect(() => {
+    if (mapRef.current) return; // initialize map only once
+    mapRef.current = new mapboxgl.Map({
+      container: mapContainerRef.current,
+      style: 'mapbox://styles/mapbox/streets-v11',
+      center: [-95, 37],
+      zoom: 3,
+    });
+  }, []);
+
+  useEffect(() => {
+    if (!mapRef.current) return;
+    document.querySelectorAll('.mapboxgl-marker').forEach((marker) => marker.remove());
+    schools.forEach((school) => {
+      if (!school.lat || !school.lng) return;
+      const popup = new mapboxgl.Popup({ offset: 25 }).setHTML(
+        `<strong>${school.name}</strong><br>${school.city}, ${school.state}`
+      );
+      new mapboxgl.Marker({color: '#FF5722'})
+      .setLngLat([school.lng, school.lat])
+        .setPopup(popup)
+        .addTo(mapRef.current);
+    }); 
+  }, [schools]);
+
+    const [selectedSchool, setSelectedSchool] = useState('');
+    const [schools, setSchools] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const [filters, setFilters] = useState({
+      clep_exam: '',
+      city: '',
+      state: '',
+      maxCredits: '',
+      maxTranscriptionFee: ''
+    });
 
   // fetch schools from backend
   useEffect(() => {
-    // Use decoded URL params for initial load
-    const initialFilters = {
-      ...filters,
-      clep_exam: getDecodedParam('clep_exam'),
-      min_score: getDecodedParam('min_score')
-    };
-    fetchSchools(initialFilters);
-  }, [searchParams]);
+    fetchSchools();
+  }, []);
 
-  const fetchSchools = async (currentFilters = filters) => {
+  const fetchSchools = async () => {
     try {
       setLoading(true);
       setError(null);
 
-      // build query params from current filters
+      // build query params
       const params = new URLSearchParams();
-      if (currentFilters.city) params.append('city', currentFilters.city);
-      if (currentFilters.state) params.append('state', currentFilters.state);
-      
-      if (currentFilters.clep_exam === 'Humanities') {
-        if (currentFilters.min_score) {
-          params.append('max_humanities', currentFilters.min_score);
-        } else {
-          params.append('min_humanities', '0'); // Show all humanities scores
-        }
-      } else if (currentFilters.clep_exam === 'American Government') {
-        if (currentFilters.min_score) {
-          params.append('max_american_government', currentFilters.min_score);
-        } else {
-          params.append('min_american_government', '0'); // Show all american government scores
-        }
-      }
+      if (filters.city) params.append('city', filters.city);
+      if (filters.state) params.append('state', filters.state);
+      if (filters.clep_exam) params.append('clep_exam', filters.clep_exam);
 
-      const apiUrl = `http://localhost:8000/api/tests/search?${params}`;
-      console.log('Fetching schools with URL:', apiUrl);
-      console.log('Current filters:', currentFilters);
-      
-      const response = await fetch(apiUrl);
+      const response = await fetch(`http://localhost:8000/tests/search?${params}`);
       if (!response.ok) throw new Error('Failed to fetch schools');
 
       const result = await response.json();
-      console.log('API response:', result);
 
-      // Transform backend data to match frontend structure
-      // Based on MS Sample SMALL table structure
-      const transformedSchools = result.data.map((school, index) => ({
-        id: school.id || index + 1,
-        name: school['School Name'] || 'Unknown School',
-        city: school.City || 'Unknown',
-        state: school.State || 'Unknown',
-        location: `${school.City || 'Unknown'}, ${school.State || 'Unknown'}`,
-        humanities: school.Humanities,
-        americanGovernment: school['American Government'],
-        diCode: school['DI Code'],
+      // transform backend data into front-end shape
+      const transformedSchools = result.data.map((institution, i) => ({
+        id: institution['MSEA Org ID'] || i,
+        name: institution.Name,
+        city: institution.City,
+        state: institution.State,
+        zip: institution.Zip,
+        location: `${institution.City}, ${institution.State}`,
+        enrollment: institution.Enrollment,
+        maxCredits: institution['Max Credits'],
+        transcriptionFee: institution['Transcription Fee'],
+        canUseForFailedCourses: institution['Can Use For Failed Courses'],
+        canEnrolledStudentsUseCLEP: institution['Can Enrolled Students Use CLEP'],
+        scoreValidity: institution['Score Validity (years)'],
+        clepWebUrl: institution['CLEP Web URL'],
         // fake coordinates for map placement
         lat: 37 + Math.random() * 10,
         lng: -95 + Math.random() * 20,
@@ -112,101 +108,16 @@ const [reportData, setReportData] = useState({
     }
   };
 
-  const handleReportSubmit = async (e) => {
-  e.preventDefault();
-  
-  try {
-    // Send report to backend
-    const response = await fetch('http://localhost:8000/api/reports/outdated', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(reportData)
-    });
-    
-    if (response.ok) {
-      alert('Thank you for your report! We will review the information.');
-      setShowReportForm(false);
-      setReportData({ institutionName: '', clepExams: [] });
-    } else {
-      alert('Failed to submit report. Please try again.');
-    }
-  } catch (err) {
-    console.error('Error submitting report:', err);
-    alert('Failed to submit report. Please try again.');
-  }
-};
-
-const handleClepExamToggle = (exam) => {
-  setReportData(prev => ({
-    ...prev,
-    clepExams: prev.clepExams.includes(exam)
-      ? prev.clepExams.filter(e => e !== exam)
-      : [...prev.clepExams, exam]
-  }));
-};
-
   const handleFilterChange = (key, value) => setFilters((prev) => ({ ...prev, [key]: value }));
 
-  const handleApplyFilters = () => {
-    console.log('Applying filters:', filters);
-    fetchSchools(filters);
-  };
+  const handleApplyFilters = () => fetchSchools();
 
   // UI
   return (
     <div className="relative w-screen h-screen overflow-hidden">
-      {/* MAP BACKGROUND */}
-      <div className="absolute inset-0 bg-gray-900">
-        <div className="w-full h-full flex items-center justify-center relative">
-          {/* subtle grid overlay */}
-          <div className="absolute inset-0 opacity-10">
-            <div className="grid grid-cols-12 grid-rows-8 h-full w-full">
-              {[...Array(96)].map((_, i) => (
-                <div key={i} className="border border-gray-700"></div>
-              ))}
-            </div>
-          </div>
-
-          {/* map placeholder center text */}
-          <div className="relative z-10 text-center">
-            <MapPin className="w-16 h-16 text-gray-600 mx-auto mb-4" />
-            <p className="text-gray-400 text-lg font-medium">
-              {loading ? 'Loading CLEP Institutions...' : 'Interactive Map'}
-            </p>
-            <p className="text-gray-500 text-sm mt-2">
-              {schools.length
-                ? `${schools.length} schools found`
-                : loading
-                ? 'Fetching data from registrar directory...'
-                : 'No results — adjust filters'}
-            </p>
-          </div>
-
-          {/* dynamic map markers */}
-          {schools.slice(0, 20).map((school, index) => (
-            <div
-              key={school.id}
-              className="absolute w-6 h-6 bg-blue-600 rounded-full border-4 border-white shadow-lg cursor-pointer hover:bg-blue-700"
-              style={{
-                top: `${20 + (index * 11) % 60}%`,
-                left: `${25 + (index * 7) % 50}%`,
-              }}
-              title={school.name}
-              onClick={() => setSelectedSchool(school.id)}
-            />
-          ))}
-
-          {/* legend */}
-          <div className="absolute bottom-4 left-4 bg-white rounded-lg shadow-lg px-4 py-3 z-20">
-            <div className="flex items-center gap-2 text-sm">
-              <div className="w-3 h-3 bg-blue-600 rounded-full"></div>
-              <span className="text-gray-700 font-medium">Accepts CLEP Credit</span>
-            </div>
-
-          </div>
-        </div>
+      {/* MAP CONTAINER */}
+      <div className="absolute inset-0">
+        <div ref={mapContainerRef} className ="w-full h-full" />
       </div>
 
       {/* FILTER SIDEBAR */}
@@ -219,75 +130,34 @@ const handleClepExamToggle = (exam) => {
         <div className="space-y-4">
           {/* CLEP exam */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">CLEP Exam Type</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">CLEP Exam</label>
             <select
               value={filters.clep_exam}
               onChange={(e) => handleFilterChange('clep_exam', e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
             >
               <option value="">All CLEP Exams</option>
-              <option value="American Government">American Government</option>
-              <option value="American Literature">American Literature</option>
-              <option value="Analyzing & Interpreting Literature">Analyzing & Interpreting Literature</option>
-              <option value="Biology">Biology</option>
-              <option value="Calculus">Calculus</option>
-              <option value="Chemistry">Chemistry</option>
-              <option value="College Algebra">College Algebra</option>
-              <option value="College Composition">College Composition</option>
-              <option value="College Mathematics">College Mathematics</option>
-              <option value="English Literature">English Literature</option>
-              <option value="Financial Accounting">Financial Accounting</option>
-              <option value="French Language">French Language</option>
-              <option value="German Language">German Language</option>
-              <option value="History of the United States I">History of the United States I</option>
-              <option value="History of the United States II">History of the United States II</option>
-              <option value="Human Growth and Development">Human Growth and Development</option>
-              <option value="Information Systems">Information Systems</option>
-              <option value="Introductory Business Law">Introductory Business Law</option>
-              <option value="Introductory Psychology">Introductory Psychology</option>
-              <option value="Introductory Sociology">Introductory Sociology</option>
-              <option value="Natural Sciences">Natural Sciences</option>
-              <option value="Precalculus">Precalculus</option>
-              <option value="Principles of Macroeconomics">Principles of Macroeconomics</option>
-              <option value="Principles of Microeconomics">Principles of Microeconomics</option>
-              <option value="Principles of Management">Principles of Management</option>
-              <option value="Principles of Marketing">Principles of Marketing</option>
-              <option value="Spanish Language">Spanish Language</option>
-              <option value="Western Civilization I">Western Civilization I</option>
-              <option value="Western Civilization II">Western Civilization II</option>
+              <option value="5">Calculus</option>
+              <option value="7">College Algebra</option>
+              <option value="8">College Composition</option>
+              <option value="28">Principles of Macroeconomics</option>
+              <option value="30">Principles of Marketing</option>
             </select>
           </div>
 
-         {/* min score */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Minimum CLEP Score
-          </label>
-          <input
-            type="number"
-            value={filters.min_score}
-            onChange={(e) => handleFilterChange('min_score', e.target.value)}
-            placeholder="e.g. 50"
-            min="20"
-            max="80"
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
-
-        {/* last updated */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Institution Policy Last Updated</label>
-          <select
-            value={filters.last_updated}
-            onChange={(e) => handleFilterChange('last_updated', e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-          >
-            <option value="">Any time</option>
-            <option value="1-6">1-6 months ago</option>
-            <option value="6-12">6-12 months ago</option>
-            <option value="12+">1+ years ago</option>
-          </select>
-        </div>
+          {/* min credits */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Minimum CLEP Score
+            </label>
+            <input
+              type="number"
+              value={filters.maxCredits}
+              onChange={(e) => handleFilterChange('maxCredits', e.target.value)}
+              placeholder="e.g. 30"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
 
           {/* city */}
           <div>
@@ -343,123 +213,6 @@ const handleClepExamToggle = (exam) => {
           </button>
         </div>
       </div>
-      {/* REPORT BUTTON */}
-      <button
-        onClick={() => setShowReportForm(true)}
-        className="fixed bottom-6 right-6 z-30 bg-red-600 text-white px-6 py-3 rounded-lg shadow-lg hover:bg-red-700 transition-colors font-medium text-sm"
-      >
-        Report Outdated Institution Information
-      </button>
-
-      {/* REPORT FORM POPUP */}
-      {showReportForm && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 flex items-center justify-center p-4">
-          <div className="bg-white rounded-xl shadow-2xl w-full max-w-md max-h-[80vh] overflow-y-auto">
-            <div className="p-6">
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="text-lg font-semibold text-gray-900">Report Outdated Information</h3>
-                <button
-                  onClick={() => setShowReportForm(false)}
-                  className="text-gray-400 hover:text-gray-600"
-                >
-                  <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
-              </div>
-
-              <form onSubmit={handleReportSubmit} className="space-y-4">
-                {/* Institution Name */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Institution Name *
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={reportData.institutionName}
-                    onChange={(e) => setReportData(prev => ({ ...prev, institutionName: e.target.value }))}
-                    placeholder="Enter institution name"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"
-                  />
-                </div>
-
-                {/* CLEP Exam Types */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    CLEP Exam Types * (select all that apply)
-                  </label>
-                  <div className="border border-gray-300 rounded-lg max-h-48 overflow-y-auto p-3 space-y-2">
-                    {[
-                      'All policies',
-                      'American Government',
-                      'American Literature',
-                      'Analyzing & Interpreting Literature',
-                      'Biology',
-                      'Calculus',
-                      'Chemistry',
-                      'College Algebra',
-                      'College Composition',
-                      'College Mathematics',
-                      'English Literature',
-                      'Financial Accounting',
-                      'French Language',
-                      'German Language',
-                      'History of the United States I',
-                      'History of the United States II',
-                      'Human Growth and Development',
-                      'Information Systems',
-                      'Introductory Business Law',
-                      'Introductory Psychology',
-                      'Introductory Sociology',
-                      'Natural Sciences',
-                      'Precalculus',
-                      'Principles of Macroeconomics',
-                      'Principles of Microeconomics',
-                      'Principles of Management',
-                      'Principles of Marketing',
-                      'Spanish Language',
-                      'Western Civilization I',
-                      'Western Civilization II'
-                    ].map((exam) => (
-                      <label key={exam} className="flex items-center space-x-2 cursor-pointer hover:bg-gray-50 p-1 rounded">
-                        <input
-                          type="checkbox"
-                          checked={reportData.clepExams.includes(exam)}
-                          onChange={() => handleClepExamToggle(exam)}
-                          className="w-4 h-4 text-red-600 border-gray-300 rounded focus:ring-red-500"
-                        />
-                        <span className="text-sm text-gray-700">{exam}</span>
-                      </label>
-                    ))}
-                  </div>
-                  <p className="text-xs text-gray-500 mt-1">
-                    {reportData.clepExams.length} exam(s) selected
-                  </p>
-                </div>
-
-                {/* Buttons */}
-                <div className="flex gap-3 pt-2">
-                  <button
-                    type="button"
-                    onClick={() => setShowReportForm(false)}
-                    className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors font-medium"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    disabled={!reportData.institutionName || reportData.clepExams.length === 0}
-                    className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    Submit Report
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* SCHOOL DROPDOWN */}
       <div className="absolute top-6 right-6 z-30 w-96 bg-white/95 backdrop-blur-md rounded-xl border border-gray-200 shadow-lg p-5">
