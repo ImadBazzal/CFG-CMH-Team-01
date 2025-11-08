@@ -145,7 +145,7 @@ const ResultsPage = () => {
         <div className="space-y-4">
           {/* CLEP exam */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">CLEP Exam</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">CLEP Exam Type</label>
             <select
               value={filters.clep_exam}
               onChange={(e) => handleFilterChange('clep_exam', e.target.value)}
@@ -165,7 +165,6 @@ const ResultsPage = () => {
             </select>
           </div>
 
-          {/* min credits */}
          {/* min score */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
