@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react'
 
 const DEFAULT_API_BASE_URL =
-  import.meta?.env?.VITE_API_BASE_URL?.replace(/\/$/, '') ?? 'http://localhost:8000'
+  import.meta?.env?.VITE_API_BASE_URL?.replace(/\/$/, '') ?? 'http://localhost:8000/api'
 
 const initialFilters = {
   testType: '',
@@ -10,6 +10,8 @@ const initialFilters = {
 
 const testOptions = [
   'Algebra',
+  'Humanities',
+  'American Government',
   'Biology',
   'Chemistry',
   'College Composition',
@@ -52,13 +54,14 @@ const Searchbar = ({ apiBaseUrl = DEFAULT_API_BASE_URL, onResults, onError }) =>
   const buildQueryString = (activeFilters) => {
     const params = new URLSearchParams()
 
-    if (activeFilters.testType.trim()) params.append('test_name', activeFilters.testType.trim())
-
     if (activeFilters.score !== '') {
       const parsedScore = Number(activeFilters.score)
       if (!Number.isNaN(parsedScore)) {
-        params.append('min_score', parsedScore)
-        params.append('max_score', parsedScore)
+        if (activeFilters.testType === 'Humanities') {
+          params.append('min_humanities', parsedScore)
+        } else if (activeFilters.testType === 'American Government') {
+          params.append('min_american_government', parsedScore)
+        }
       }
     }
 
@@ -75,6 +78,7 @@ const Searchbar = ({ apiBaseUrl = DEFAULT_API_BASE_URL, onResults, onError }) =>
 
     const queryString = buildQueryString(filters)
     const endpoint = `${normalizedBaseUrl}/tests/search${queryString ? `?${queryString}` : ''}`
+    console.log('Making request to:', endpoint)
 
     setLoading(true)
     setErrorMessage('')
@@ -195,15 +199,15 @@ const Searchbar = ({ apiBaseUrl = DEFAULT_API_BASE_URL, onResults, onError }) =>
             <span>Location</span>
             <span>School</span>
           </div>
-          {results.map((result) => (
+          {results.map((result, index) => (
             <div
-              key={result.id ?? `${result.test_name}-${result.school}-${result.location}`}
+              key={result.id ?? index}
               className="grid grid-cols-2 gap-3 border-t border-gray-100 pt-3 text-sm text-gray-800 sm:grid-cols-4 sm:text-base"
             >
-              <span>{result.test_name ?? 'N/A'}</span>
-              <span>{result.test_score ?? '—'}</span>
-              <span>{result.location ?? 'Unknown'}</span>
-              <span>{result.school ?? 'Unknown'}</span>
+              <span>{filters.testType || 'N/A'}</span>
+              <span>{filters.testType === 'Humanities' ? result.Humanities : result['American Government'] ?? '—'}</span>
+              <span>{`${result.City}, ${result.State}` ?? 'Unknown'}</span>
+              <span>{result['School Name'] ?? 'Unknown'}</span>
             </div>
           ))}
         </div>

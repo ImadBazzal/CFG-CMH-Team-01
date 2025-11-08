@@ -42,16 +42,16 @@ def search_tests(
             query = query.ilike("State", f"%{state}%")
         
         if min_humanities is not None:
-            query = query.gte("Humanities", min_humanities)
+            query = query.neq("Humanities", "NULL").gte("Humanities", str(min_humanities))
         
         if max_humanities is not None:
-            query = query.lte("Humanities", max_humanities)
+            query = query.neq("Humanities", "NULL").lte("Humanities", str(max_humanities))
         
         if min_american_government is not None:
-            query = query.gte("American Government", min_american_government)
+            query = query.neq("American Government", "NULL").gte("American Government", str(min_american_government))
         
         if max_american_government is not None:
-            query = query.lte("American Government", max_american_government)
+            query = query.neq("American Government", "NULL").lte("American Government", str(max_american_government))
         
         result = query.execute()
         return {"data": result.data, "count": len(result.data)}
@@ -74,16 +74,16 @@ def filter_tests(filters: TestDataFilter):
             query = query.ilike("State", f"%{filters.state}%")
         
         if filters.min_humanities is not None:
-            query = query.gte("Humanities", filters.min_humanities)
+            query = query.neq("Humanities", "NULL").gte("Humanities", str(filters.min_humanities))
         
         if filters.max_humanities is not None:
-            query = query.lte("Humanities", filters.max_humanities)
+            query = query.neq("Humanities", "NULL").lte("Humanities", str(filters.max_humanities))
         
         if filters.min_american_government is not None:
-            query = query.gte("American Government", filters.min_american_government)
+            query = query.neq("American Government", "NULL").gte("American Government", str(filters.min_american_government))
         
         if filters.max_american_government is not None:
-            query = query.lte("American Government", filters.max_american_government)
+            query = query.neq("American Government", "NULL").lte("American Government", str(filters.max_american_government))
         
         result = query.execute()
         return {"data": result.data, "count": len(result.data)}
