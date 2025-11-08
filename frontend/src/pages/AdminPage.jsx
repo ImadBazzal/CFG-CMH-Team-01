@@ -1,14 +1,59 @@
 import React, { useState } from 'react'
 
+const AdminDashboard = () => {
+  return (
+    <div className="min-h-screen bg-[linear-gradient(135deg,#030712,#020310_55%,#050917)]">
+      <header className="border-b border-white/10 bg-black/20">
+        <div className="px-8 py-6 flex justify-between items-center">
+          <div>
+            <h1 className="text-2xl font-semibold text-white">Admin Dashboard</h1>
+            <p className="text-sm text-white/60">CLEP Data Management</p>
+          </div>
+          <button
+            className="px-4 py-2 text-sm text-white/80 hover:text-white border border-white/10 rounded-lg hover:bg-white/5 transition-colors"
+            onClick={() => setIsLoggedIn(false)}
+          >
+            Sign Out
+          </button>
+        </div>
+      </header>
+      
+      <main className="p-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {/* Placeholder for future management sections */}
+          <div className="p-6 rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm">
+            <h2 className="text-lg font-medium text-white mb-2">Institution Management</h2>
+            <p className="text-sm text-white/70">Manage CLEP-accepting institutions and their policies.</p>
+          </div>
+          
+          <div className="p-6 rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm">
+            <h2 className="text-lg font-medium text-white mb-2">Data Analytics</h2>
+            <p className="text-sm text-white/70">View acceptance rates and policy trends.</p>
+          </div>
+          
+          <div className="p-6 rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm">
+            <h2 className="text-lg font-medium text-white mb-2">User Management</h2>
+            <p className="text-sm text-white/70">Manage administrator and institution access.</p>
+          </div>
+        </div>
+      </main>
+    </div>
+  )
+}
+
 const AdminPage = () => {
   const [credentials, setCredentials] = useState({
     username: '',
     password: ''
   })
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    console.log('Login attempted with:', credentials)
+    // TODO: Add actual authentication logic here
+    if (credentials.username && credentials.password) {
+      setIsLoggedIn(true)
+    }
   }
 
   const handleChange = (e) => {
@@ -16,6 +61,10 @@ const AdminPage = () => {
       ...prev,
       [e.target.name]: e.target.value
     }))
+  }
+
+  if (isLoggedIn) {
+    return <AdminDashboard />
   }
 
   return (
