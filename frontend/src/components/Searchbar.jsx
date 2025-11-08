@@ -88,7 +88,16 @@ const Searchbar = ({ apiBaseUrl = DEFAULT_API_BASE_URL, onResults, onError }) =>
       if (!response.ok) throw new Error('Unable to fetch test data. Please try again.')
 
       const payload = await response.json()
-      const payloadData = payload?.data ?? []
+      let payloadData = payload?.data ?? []
+      
+      // Filter out NULL values when searching by score
+      if (filters.score !== '' && filters.testType) {
+        payloadData = payloadData.filter(result => {
+          const scoreValue = filters.testType === 'Humanities' ? result.Humanities : result['American Government']
+          return scoreValue !== 'NULL' && scoreValue !== null
+        })
+      }
+      
       setResults(payloadData)
       setLastQuery({ endpoint, count: payload?.count ?? payloadData.length })
       onResults?.(payload)
@@ -205,7 +214,7 @@ const Searchbar = ({ apiBaseUrl = DEFAULT_API_BASE_URL, onResults, onError }) =>
               className="grid grid-cols-2 gap-3 border-t border-gray-100 pt-3 text-sm text-gray-800 sm:grid-cols-4 sm:text-base"
             >
               <span>{filters.testType || 'N/A'}</span>
-              <span>{filters.testType === 'Humanities' ? result.Humanities : result['American Government'] ?? '—'}</span>
+              <span>{filters.testType === 'Humanities' ? (result.Humanities !== 'NULL' ? result.Humanities : '—') : (result['American Government'] !== 'NULL' ? result['American Government'] : '—')}</span>
               <span>{`${result.City}, ${result.State}` ?? 'Unknown'}</span>
               <span>{result['School Name'] ?? 'Unknown'}</span>
             </div>
