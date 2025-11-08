@@ -1,42 +1,29 @@
 import React, { useState } from 'react'
 
-const AdminDashboard = () => {
+const AdminDashboard = ({ onLogout }) => {
   return (
-    <div className="min-h-screen bg-[linear-gradient(135deg,#030712,#020310_55%,#050917)]">
-      <header className="border-b border-white/10 bg-black/20">
-        <div className="px-8 py-6 flex justify-between items-center">
-          <div>
-            <h1 className="text-2xl font-semibold text-white">Admin Dashboard</h1>
-            <p className="text-sm text-white/60">CLEP Data Management</p>
-          </div>
+    <div className="min-h-screen bg-[linear-gradient(135deg,#030712,#020310_55%,#050917)] text-white p-8">
+      <div className="max-w-3xl mx-auto">
+        <div className="flex justify-between items-center mb-8">
+          <h1 className="text-2xl font-semibold">Admin Dashboard</h1>
           <button
-            className="px-4 py-2 text-sm text-white/80 hover:text-white border border-white/10 rounded-lg hover:bg-white/5 transition-colors"
-            onClick={() => setIsLoggedIn(false)}
+            onClick={onLogout}
+            className="px-4 py-2 text-sm border border-white/10 rounded-lg hover:bg-white/5"
           >
             Sign Out
           </button>
         </div>
-      </header>
-      
-      <main className="p-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {/* Placeholder for future management sections */}
-          <div className="p-6 rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm">
-            <h2 className="text-lg font-medium text-white mb-2">Institution Management</h2>
-            <p className="text-sm text-white/70">Manage CLEP-accepting institutions and their policies.</p>
-          </div>
-          
-          <div className="p-6 rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm">
-            <h2 className="text-lg font-medium text-white mb-2">Data Analytics</h2>
-            <p className="text-sm text-white/70">View acceptance rates and policy trends.</p>
-          </div>
-          
-          <div className="p-6 rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm">
-            <h2 className="text-lg font-medium text-white mb-2">User Management</h2>
-            <p className="text-sm text-white/70">Manage administrator and institution access.</p>
+        
+        <div className="bg-white/5 border border-white/10 rounded-lg p-6">
+          <h2 className="text-xl mb-4">Welcome, Admin</h2>
+          <p className="text-white/70 mb-4">Admin Interface</p>
+          <div className="space-y-2 text-white/70">
+            <p>• View and manage CLEP acceptance policies</p>
+            <p>• Update institution information manually</p>
+            <p>• Monitor system activity</p>
           </div>
         </div>
-      </main>
+      </div>
     </div>
   )
 }
@@ -50,7 +37,7 @@ const AdminPage = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    // TODO: Add actual authentication logic here
+    // Simple proof of concept login
     if (credentials.username && credentials.password) {
       setIsLoggedIn(true)
     }
