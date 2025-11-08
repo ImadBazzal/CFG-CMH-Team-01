@@ -1,6 +1,14 @@
-import React from 'react'
+import React, { useState } from 'react'
+
+const FAKE_SUMMARY = `
+You reported a score of 50 on the CLEP Biology exam. That places you in the same score band as students who typically receive 6 science credits at Metropolitan State, Northbridge University, and the MSU satellite campuses within 40 miles. 
+
+Those institutions also award elective credit for related exams with comparable rigor—Calculus (min 50), Natural Sciences (min 50), and Human Growth & Development (min 52). If you’re targeting Biology credit, Modern States suggests pairing Biology with one of those adjacent exams to maximize transferable hours at the schools above.
+`.trim()
 
 const AISummaryPage = () => {
+  const [summary, setSummary] = useState('')
+  const [hasGenerated, setHasGenerated] = useState(false)
 
   return (
     <main className="relative flex min-h-screen w-full items-center justify-center overflow-hidden bg-[radial-gradient(circle_at_15%_20%,rgba(71,134,255,0.25),transparent_45%),radial-gradient(circle_at_80%_10%,rgba(255,86,180,0.25),transparent_40%),linear-gradient(135deg,#030712,#020310_55%,#050917)] px-4 py-10 sm:px-6 lg:px-12">
@@ -33,16 +41,27 @@ const AISummaryPage = () => {
             </span>
           </div>
 
-          <div className="mt-6 rounded-2xl border border-dashed border-white/20 bg-white/5 px-4 py-8 text-center text-white/60">
-            Your generated summary will appear here once it&apos;s ready.
+          <div className="mt-6 rounded-2xl border border-dashed border-white/20 bg-white/5 px-5 py-8 text-white/80">
+            {hasGenerated ? (
+              <p className="whitespace-pre-line text-left text-base leading-relaxed text-white/90">
+                {summary}
+              </p>
+            ) : (
+              <p className="text-center text-white/60">
+                Your generated summary will appear here once it&apos;s ready.
+              </p>
+            )}
           </div>
 
           <button
             type="button"
             className="mt-8 w-full rounded-2xl bg-gradient-to-r from-[#6f7dff] via-[#7f5dff] to-[#f97bff] px-6 py-3 text-base font-semibold text-white shadow-[0_18px_35px_rgba(111,125,255,0.35)] transition-all hover:-translate-y-0.5"
-            onClick={() => {}}
+            onClick={() => {
+              setSummary(FAKE_SUMMARY)
+              setHasGenerated(true)
+            }}
           >
-            Generate Summary
+            {hasGenerated ? 'Regenerate Summary' : 'Generate Summary'}
           </button>
         </div>
       </section>
