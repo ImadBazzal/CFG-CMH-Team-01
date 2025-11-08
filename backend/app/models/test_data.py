@@ -2,8 +2,14 @@ from pydantic import BaseModel
 from typing import Optional
 
 class TestDataFilter(BaseModel):
-    test_name: Optional[str] = None
-    min_score: Optional[float] = None
-    max_score: Optional[float] = None
-    location: Optional[str] = None
-    school: Optional[str] = None
+    school_name: Optional[str] = None
+    city: Optional[str] = None
+    state: Optional[str] = None
+    min_humanities: Optional[float] = None
+    max_humanities: Optional[float] = None
+    min_american_government: Optional[float] = None
+    max_american_government: Optional[float] = None
+
+class TestScoreUpdate(BaseModel):
+    humanities: Optional[float] = None
+    american_government: Optional[float] = None

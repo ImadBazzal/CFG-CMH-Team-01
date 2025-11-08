@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.api import routes
+from app.api import routes, update_routes
 
 app = FastAPI()
 
@@ -13,6 +13,7 @@ app.add_middleware(
 )
 
 app.include_router(routes.router, prefix="/api")
+app.include_router(update_routes.router, prefix="/api")
 
 if __name__ == "__main__":
     import uvicorn
