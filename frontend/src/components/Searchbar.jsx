@@ -58,9 +58,9 @@ const Searchbar = ({ apiBaseUrl = DEFAULT_API_BASE_URL, onResults, onError }) =>
       const parsedScore = Number(activeFilters.score)
       if (!Number.isNaN(parsedScore)) {
         if (activeFilters.testType === 'Humanities') {
-          params.append('min_humanities', parsedScore)
+          params.append('max_humanities', parsedScore)
         } else if (activeFilters.testType === 'American Government') {
-          params.append('min_american_government', parsedScore)
+          params.append('max_american_government', parsedScore)
         }
       }
     }
