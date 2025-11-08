@@ -24,12 +24,15 @@ def search_tests(
     school_name: Optional[str] = Query(None, description="Search by school name"),
     city: Optional[str] = Query(None, description="Filter by city"),
     state: Optional[str] = Query(None, description="Filter by state"),
+    clep_exam: Optional[str] = Query(None, description="CLEP exam type"),
+    min_score: Optional[float] = Query(None, description="Minimum score for the selected CLEP exam"),
     min_humanities: Optional[float] = Query(None, description="Minimum humanities score"),
     max_humanities: Optional[float] = Query(None, description="Maximum humanities score"),
     min_american_government: Optional[float] = Query(None, description="Minimum American Government score"),
     max_american_government: Optional[float] = Query(None, description="Maximum American Government score")
 ):
     try:
+        print(f"Received parameters: clep_exam={clep_exam}, min_score={min_score}, city={city}, state={state}")
         query = supabase.table("MS Sample SMALL").select("*")
         
         if school_name:
@@ -53,6 +56,16 @@ def search_tests(
         if max_american_government is not None:
             query = query.neq("American Government", "NULL").lte("American Government", str(max_american_government))
         
+        if clep_exam:
+            if clep_exam == "Humanities":
+                query = query.neq("Humanities", "NULL")
+                if min_score is not None:
+                    query = query.gte("Humanities", str(min_score))
+            elif clep_exam == "American Government":
+                query = query.neq("American Government", "NULL")
+                if min_score is not None:
+                    query = query.gte("American Government", str(min_score))
+            
         result = query.execute()
         return {"data": result.data, "count": len(result.data)}
     

@@ -70,7 +70,9 @@ const Searchbar = ({ apiBaseUrl = DEFAULT_API_BASE_URL }) => {
     }
   }
 
-  return params.toString()
+  const queryString = params.toString()
+  console.log('Built query string:', queryString)
+  return queryString
 }
 
   const handleSearch = (event) => {
@@ -89,6 +91,7 @@ const Searchbar = ({ apiBaseUrl = DEFAULT_API_BASE_URL }) => {
 
     setErrorMessage('') // Clear any previous errors
     const queryString = buildQueryString(filters)
+    console.log('Navigating with query string:', queryString)
     navigate(`/results${queryString ? `?${queryString}` : ''}`)
   }
 

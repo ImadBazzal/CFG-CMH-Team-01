@@ -8,11 +8,21 @@ const ResultsPage = () => {
   const [schools, setSchools] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  // Helper function to decode HTML entities in URL params
+  const getDecodedParam = (param) => {
+    const value = searchParams.get(param);
+    if (!value) return '';
+    // Decode HTML entities like &amp; to &
+    const textarea = document.createElement('textarea');
+    textarea.innerHTML = value;
+    return textarea.value;
+  };
+
   const [filters, setFilters] = useState({
-    clep_exam: searchParams.get('clep_exam') || '',
+    clep_exam: getDecodedParam('clep_exam'),
     city: '',
     state: '',
-    min_score: searchParams.get('min_score') || '',
+    min_score: getDecodedParam('min_score'),
     maxCredits: '',
     maxTranscriptionFee: ''
   });
@@ -25,28 +35,48 @@ const [reportData, setReportData] = useState({
 
   // fetch schools from backend
   useEffect(() => {
-    fetchSchools();
-  }, []);
+    // Use decoded URL params for initial load
+    const initialFilters = {
+      ...filters,
+      clep_exam: getDecodedParam('clep_exam'),
+      min_score: getDecodedParam('min_score')
+    };
+    fetchSchools(initialFilters);
+  }, [searchParams]);
 
-  const fetchSchools = async () => {
+  const fetchSchools = async (currentFilters = filters) => {
     try {
       setLoading(true);
       setError(null);
 
-      // build query params
+      // build query params from current filters
       const params = new URLSearchParams();
-      if (filters.city) params.append('city', filters.city);
-      if (filters.state) params.append('state', filters.state);
-      if (filters.clep_exam) params.append('clep_exam', filters.clep_exam);
-      if (filters.min_score) params.append('min_score', filters.min_score);
+      if (currentFilters.city) params.append('city', currentFilters.city);
+      if (currentFilters.state) params.append('state', currentFilters.state);
+      
+      if (currentFilters.clep_exam === 'Humanities') {
+        if (currentFilters.min_score) {
+          params.append('max_humanities', currentFilters.min_score);
+        } else {
+          params.append('min_humanities', '0'); // Show all humanities scores
+        }
+      } else if (currentFilters.clep_exam === 'American Government') {
+        if (currentFilters.min_score) {
+          params.append('max_american_government', currentFilters.min_score);
+        } else {
+          params.append('min_american_government', '0'); // Show all american government scores
+        }
+      }
 
-      // Use correct backend API endpoint
-      const response = await fetch(`http://localhost:8000/api/tests/search?${params}`);
+      const apiUrl = `http://localhost:8000/api/tests/search?${params}`;
+      console.log('Fetching schools with URL:', apiUrl);
+      console.log('Current filters:', currentFilters);
+      
+      const response = await fetch(apiUrl);
       if (!response.ok) throw new Error('Failed to fetch schools');
 
       const result = await response.json();
-
-      // ... rest of the function stays the same
+      console.log('API response:', result);
 
       // Transform backend data to match frontend structure
       // Based on MS Sample SMALL table structure
@@ -119,7 +149,10 @@ const handleClepExamToggle = (exam) => {
 
   const handleFilterChange = (key, value) => setFilters((prev) => ({ ...prev, [key]: value }));
 
-  const handleApplyFilters = () => fetchSchools();
+  const handleApplyFilters = () => {
+    console.log('Applying filters:', filters);
+    fetchSchools(filters);
+  };
 
   // UI
   return (
