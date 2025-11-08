@@ -232,20 +232,20 @@ const handleClepExamToggle = (exam) => {
       </div>
 
       {/* FILTER SIDEBAR */}
-      <div className="absolute top-6 left-6 z-50 w-80 bg-white/95 backdrop-blur-md rounded-xl border border-gray-200 shadow-lg p-5">
+      <div className="absolute top-6 left-6 z-50 w-80 bg-white/10 backdrop-blur-md rounded-xl border border-white/20 shadow-2xl p-5">
         <div className="flex items-center gap-2 mb-4">
-          <Filter className="w-5 h-5 text-gray-700" />
-          <h2 className="font-semibold text-gray-900">Filters</h2>
+          <Filter className="w-5 h-5 text-white/80" />
+          <h2 className="font-semibold text-white">Filters</h2>
         </div>
 
         <div className="space-y-4">
           {/* CLEP exam */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">CLEP Exam Type</label>
+            <label className="block text-sm font-medium text-white/80 mb-1">CLEP Exam Type</label>
             <select
               value={filters.clep_exam}
               onChange={(e) => handleFilterChange('clep_exam', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/50 focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
             >
               <option value="">All CLEP Exams</option>
               <option value="American Government">American Government</option>
@@ -282,7 +282,7 @@ const handleClepExamToggle = (exam) => {
 
          {/* min score */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium text-white/80 mb-1">
             Minimum CLEP Score
           </label>
           <input
@@ -292,17 +292,17 @@ const handleClepExamToggle = (exam) => {
             placeholder="e.g. 50"
             min="20"
             max="80"
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/50 focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
           />
         </div>
 
         {/* last updated */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Institution Policy Last Updated</label>
+          <label className="block text-sm font-medium text-white/80 mb-1">Institution Policy Last Updated</label>
           <select
             value={filters.last_updated}
             onChange={(e) => handleFilterChange('last_updated', e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
           >
             <option value="">Any time</option>
             <option value="1-6">1-6 months ago</option>
@@ -313,23 +313,23 @@ const handleClepExamToggle = (exam) => {
 
           {/* city */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">City</label>
+            <label className="block text-sm font-medium text-white/80 mb-1">City</label>
             <input
               type="text"
               value={filters.city}
               onChange={(e) => handleFilterChange('city', e.target.value)}
               placeholder="e.g. Boston"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/50 focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
             />
           </div>
 
           {/* state */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">State</label>
+            <label className="block text-sm font-medium text-white/80 mb-1">State</label>
             <select
               value={filters.state}
               onChange={(e) => handleFilterChange('state', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
             >
               <option value="">All States</option>
               <option value="CA">California</option>
@@ -342,24 +342,24 @@ const handleClepExamToggle = (exam) => {
 
           {/* max fee */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-white/80 mb-1">
               Max Transcription Fee
             </label>
             <div className="relative">
-              <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">$</span>
+              <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white/60">$</span>
               <input
                 type="number"
                 value={filters.maxTranscriptionFee}
                 onChange={(e) => handleFilterChange('maxTranscriptionFee', e.target.value)}
                 placeholder="100"
-                className="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="w-full pl-8 pr-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/50 focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
               />
             </div>
           </div>
 
           <button
             onClick={handleApplyFilters}
-            className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors font-medium"
+            className="w-full bg-gradient-to-r from-blue-500 to-blue-600 text-white py-2 px-4 rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all duration-200 font-medium shadow-lg"
           >
             Apply Filters
           </button>
@@ -484,12 +484,12 @@ const handleClepExamToggle = (exam) => {
       )}
 
       {/* SCHOOL DROPDOWN */}
-      <div className="absolute top-6 right-6 z-50 w-96 bg-white/95 backdrop-blur-md rounded-xl border border-gray-200 shadow-lg p-5">
-        <label className="block text-sm font-medium text-gray-700 mb-2">Select a School</label>
+      <div className="absolute top-6 right-6 z-50 w-96 bg-white/10 backdrop-blur-md rounded-xl border border-white/20 shadow-2xl p-5">
+        <label className="block text-sm font-medium text-white/80 mb-2">Select a School</label>
         <select
           value={selectedSchool}
           onChange={(e) => setSelectedSchool(e.target.value)}
-          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-base"
+          className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white focus:ring-2 focus:ring-blue-400 focus:border-blue-400 text-base"
           disabled={loading}
         >
           <option value="">
