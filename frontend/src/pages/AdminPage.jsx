@@ -95,32 +95,42 @@ const AdminDashboard = ({ onLogout }) => {
   }
 
   return (
-    <div className="min-h-screen bg-[linear-gradient(135deg,#030712,#020310_55%,#050917)] text-white p-8">
-      <div className="max-w-6xl mx-auto">
+    <main className="relative flex min-h-screen w-full overflow-hidden bg-[radial-gradient(circle_at_15%_20%,rgba(71,134,255,0.25),transparent_45%),radial-gradient(circle_at_80%_10%,rgba(255,86,180,0.25),transparent_40%),linear-gradient(135deg,#030712,#020310_55%,#050917)] px-4 py-10 sm:px-6 lg:px-12">
+      <div
+        className="pointer-events-none absolute -right-[10%] -top-[25%] h-[60vw] w-[60vw] rounded-full bg-[radial-gradient(circle,rgba(80,120,255,0.3),transparent_60%)] blur-[8px]"
+        aria-hidden="true"
+      />
+      <div className="relative z-10 w-full max-w-7xl mx-auto">
         <div className="flex justify-between items-center mb-8">
           <div>
-            <h1 className="text-2xl font-semibold">Admin Dashboard</h1>
-            <p className="text-white/60 mt-1">Database Statistics Overview</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-white/60">
+              Modern States
+            </p>
+            <h1 className="mt-3 text-3xl font-semibold text-white sm:text-[2.4rem]">
+              Admin Dashboard
+            </h1>
+            <p className="mt-3 text-base text-white/70">
+              Database Statistics Overview
+            </p>
           </div>
           <button
             onClick={onLogout}
-            className="px-4 py-2 text-sm border border-white/10 rounded-lg hover:bg-white/5"
+            className="rounded-full border border-white/10 bg-white/5 px-6 py-3 text-sm font-semibold text-white/80 transition hover:bg-white/10"
           >
             Sign Out
           </button>
         </div>
 
         {stats.loading ? (
-          <div className="text-center py-8">Loading database statistics...</div>
+          <div className="text-center py-8 text-white/70">Loading database statistics...</div>
         ) : stats.error ? (
-          <div className="text-red-400 bg-red-400/10 border border-red-400/20 rounded-lg p-4 text-center">
+          <div className="rounded-2xl border border-red-400/20 bg-red-400/10 p-6 text-center text-red-400">
             {stats.error}
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <div className="bg-white/5 border border-white/10 rounded-lg p-6">
-            Statistics Section
-              <h2 className="text-lg font-semibold mb-4">Database Overview</h2>
+            <div className="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
+              <h2 className="text-lg font-semibold text-white mb-4">Database Overview</h2>
               <div className="space-y-3">
                 <div className="flex justify-between items-center">
                   <span className="text-white/70">Total Institutions:</span>
@@ -130,13 +140,12 @@ const AdminDashboard = ({ onLogout }) => {
                   <span className="text-white/70">Policies Reported:</span>
                   <span className="font-semibold text-blue-400">{stats.data.policiesReported}</span>
                 </div>
-                {/* Complete records removed from view per request */}
               </div>
             </div>
 
             {/* CLEP Acceptance by Subject */}
-            <div className="bg-white/5 border border-white/10 rounded-lg p-6">
-              <h2 className="text-lg font-semibold mb-4">CLEP Acceptance by Subject</h2>
+            <div className="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
+              <h2 className="text-lg font-semibold text-white mb-4">CLEP Acceptance by Subject</h2>
               <div className="space-y-3">
                 <div className="flex justify-between items-center">
                   <span className="text-white/70">Humanities:</span>
@@ -158,9 +167,9 @@ const AdminDashboard = ({ onLogout }) => {
             </div>
 
             {/* Geographic Distribution */}
-            <div className="bg-white/5 border border-white/10 rounded-lg p-6">
-              <h2 className="text-lg font-semibold mb-4">Top States by Institution Count</h2>
-              <div className="space-y-3 max-h-[200px] overflow-y-auto hide-scrollbar">
+            <div className="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
+              <h2 className="text-lg font-semibold text-white mb-4">Top States by Institution Count</h2>
+              <div className="space-y-3 max-h-[200px] overflow-y-auto">
                 {Object.entries(stats.data.stateBreakdown)
                   .sort(([,a], [,b]) => b - a)
                   .slice(0, 10)
@@ -176,7 +185,7 @@ const AdminDashboard = ({ onLogout }) => {
           </div>
         )}
       </div>
-    </div>
+    </main>
   )
 }
 
@@ -231,22 +240,22 @@ const AdminPage = () => {
         className="pointer-events-none absolute -right-[10%] -top-[25%] h-[60vw] w-[60vw] rounded-full bg-[radial-gradient(circle,rgba(80,120,255,0.3),transparent_60%)] blur-[8px]"
         aria-hidden="true"
       />
-      <section className="relative z-10 w-full max-w-xl rounded-[32px] border border-white/10 bg-gradient-to-br from-[#070916]/90 to-[#070b20]/70 p-6 sm:p-10 lg:p-14 shadow-panel backdrop-blur-3xl">
-        <header className="flex flex-col items-center text-center mb-8">
+      <section className="relative z-10 w-full max-w-md rounded-[32px] border border-white/10 bg-gradient-to-br from-[#070916]/90 to-[#070b20]/70 p-6 sm:p-10 lg:p-14 shadow-panel backdrop-blur-3xl">
+        <header className="text-center">
           <p className="text-xs font-semibold uppercase tracking-[0.24em] text-white/60">
-            Administrator Access
+            Modern States
           </p>
           <h1 className="mt-3 text-3xl font-semibold text-white sm:text-[2.4rem]">
             Admin Console
           </h1>
-          <p className="mt-3 max-w-xl text-base text-white/70">
+          <p className="mt-3 text-base text-white/70">
             Secure access for CLEP acceptance policy management.
           </p>
         </header>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} className="mt-8 space-y-6">
           <div>
-            <label htmlFor="username" className="block text-sm font-medium text-white/80 mb-2">
+            <label htmlFor="username" className="block text-sm font-semibold text-white/80 mb-3">
               Username
             </label>
             <input
@@ -255,14 +264,14 @@ const AdminPage = () => {
               name="username"
               value={credentials.username}
               onChange={handleChange}
-              className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-white placeholder-white/40 focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
+              className="w-full rounded-2xl border border-white/10 bg-white/5 px-5 py-3.5 text-base text-white placeholder-white/40 transition focus:border-white/30 focus:bg-white/10 focus:outline-none"
               placeholder="Enter your username"
               required
             />
           </div>
 
           <div>
-            <label htmlFor="password" className="block text-sm font-medium text-white/80 mb-2">
+            <label htmlFor="password" className="block text-sm font-semibold text-white/80 mb-3">
               Password
             </label>
             <input
@@ -271,19 +280,19 @@ const AdminPage = () => {
               name="password"
               value={credentials.password}
               onChange={handleChange}
-              className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-white placeholder-white/40 focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
+              className="w-full rounded-2xl border border-white/10 bg-white/5 px-5 py-3.5 text-base text-white placeholder-white/40 transition focus:border-white/30 focus:bg-white/10 focus:outline-none"
               placeholder="Enter your password"
               required
             />
           </div>
 
           {loginError && (
-            <div className="text-red-400 text-sm text-center mb-4">
+            <div className="text-red-400 text-sm text-center">
               {loginError}
             </div>
           )}
-          
-          <div className="pt-4">
+
+          <div className="mt-8 flex flex-col gap-3">
             <button
               type="submit"
               className="w-full rounded-full bg-gradient-to-r from-[#6f7dff] to-[#5ecfff] px-6 py-3 text-sm font-semibold text-[#020308] shadow-[0_12px_25px_rgba(94,207,255,0.25)] transition hover:-translate-y-0.5 hover:shadow-[0_18px_35px_rgba(94,207,255,0.35)]"
@@ -292,13 +301,6 @@ const AdminPage = () => {
             </button>
           </div>
         </form>
-
-        {loginError && (
-          <div className="mt-4 text-center">
-            <p className="text-sm text-white/60">
-            </p>
-          </div>
-        )}
       </section>
     </main>
   )
