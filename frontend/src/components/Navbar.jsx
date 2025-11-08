@@ -1,12 +1,20 @@
 import React from 'react'
 import { Link, NavLink } from 'react-router'
+import modernStatesLogo from '../assets/modern-states.png-removebg-preview.png'
 
 const Navbar = () => {
   return (
-    <header className="sticky top-0 z-40 border-b border-white/20 bg-white/70 backdrop-blur-lg">
-      <nav className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
-        <Link to="/" className="text-xl font-semibold tracking-tight text-slate-900">
-          Modern States
+    <header className="sticky top-0 z-40 border-b border-gray-200 bg-white shadow-sm">
+      <nav className="mx-auto flex h-20 max-w-6xl items-center justify-between px-6">
+        <Link to="/" className="flex items-center gap-3 py-2 -ml-20">
+          <img 
+            src={modernStatesLogo} 
+            alt="Modern States" 
+            className="h-16 w-auto object-contain"
+          />
+          <span className="text-2xl font-semibold tracking-tight text-slate-900">
+            Modern States
+          </span>
         </Link>
         
         <div className="flex items-center gap-3">
