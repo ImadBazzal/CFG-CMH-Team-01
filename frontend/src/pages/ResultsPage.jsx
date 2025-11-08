@@ -54,24 +54,10 @@ const [reportData, setReportData] = useState({
       setLoading(true);
       setError(null);
 
-      // build query params from current filters
+      // build query params from current filters (only city and state)
       const params = new URLSearchParams();
       if (currentFilters.city) params.append('city', currentFilters.city);
       if (currentFilters.state) params.append('state', currentFilters.state);
-      
-      if (currentFilters.clep_exam === 'Humanities') {
-        if (currentFilters.min_score) {
-          params.append('max_humanities', currentFilters.min_score);
-        } else {
-          params.append('min_humanities', '0'); // Show all humanities scores
-        }
-      } else if (currentFilters.clep_exam === 'American Government') {
-        if (currentFilters.min_score) {
-          params.append('max_american_government', currentFilters.min_score);
-        } else {
-          params.append('min_american_government', '0'); // Show all american government scores
-        }
-      }
 
       const apiUrl = `http://localhost:8000/api/tests/search?${params}`;
       console.log('Fetching schools with URL:', apiUrl);
@@ -114,6 +100,28 @@ const [reportData, setReportData] = useState({
 
       // apply frontend filters
       let filtered = transformedSchools;
+      
+      // Filter by CLEP exam type
+      if (currentFilters.clep_exam && currentFilters.clep_exam.length > 0) {
+        filtered = filtered.filter((school) => {
+          return currentFilters.clep_exam.some(exam => {
+            if (exam === 'Humanities' && school.humanities && school.humanities !== 'NULL') return true;
+            if (exam === 'American Government' && school.americanGovernment && school.americanGovernment !== 'NULL') return true;
+            return false;
+          });
+        });
+      }
+      
+      // Filter by minimum CLEP score
+      if (currentFilters.min_score) {
+        const minScore = parseInt(currentFilters.min_score);
+        filtered = filtered.filter((school) => {
+          const humanitiesScore = school.humanities && school.humanities !== 'NULL' ? parseInt(school.humanities) : null;
+          const govScore = school.americanGovernment && school.americanGovernment !== 'NULL' ? parseInt(school.americanGovernment) : null;
+          return (humanitiesScore && humanitiesScore <= minScore) || (govScore && govScore <= minScore);
+        });
+      }
+      
       if (filters.maxCredits)
         filtered = filtered.filter((s) => s.maxCredits >= parseInt(filters.maxCredits));
       if (filters.maxTranscriptionFee)
@@ -214,7 +222,7 @@ const handleClepExamToggle = (exam) => {
       </div>
 
       {/* FILTER SIDEBAR */}
-      <div className="absolute top-6 left-6 z-50 w-80 rounded-3xl border border-white/10 bg-gradient-to-br from-[#070916]/95 via-[#0b0f25]/90 to-[#131b3c]/85 p-5 shadow-[0_25px_45px_rgba(5,8,24,0.55)] backdrop-blur-2xl">
+      <div className="absolute top-12 left-4 z-50 w-72 max-h-[calc(100vh-6rem)] overflow-y-auto rounded-2xl border border-white/10 bg-gradient-to-br from-[#070916]/95 via-[#0b0f25]/90 to-[#131b3c]/85 p-4 shadow-[0_25px_45px_rgba(5,8,24,0.55)] backdrop-blur-2xl">
         <div className="flex items-center gap-2 mb-4">
           <Filter className="w-5 h-5 text-[#7f8fff]" />
           <h2 className="font-semibold text-white tracking-[0.08em] uppercase text-xs">
@@ -479,7 +487,7 @@ const handleClepExamToggle = (exam) => {
       )}
 
       {/* SCHOOL DROPDOWN */}
-      <div className="absolute top-6 right-6 z-50 w-96 rounded-3xl border border-white/10 bg-gradient-to-br from-[#070916]/95 via-[#0b0f25]/90 to-[#131b3c]/85 p-5 shadow-[0_25px_45px_rgba(5,8,24,0.55)] backdrop-blur-2xl">
+      <div className="absolute top-12 right-4 z-50 w-80 max-h-[calc(100vh-6rem)] overflow-y-auto rounded-2xl border border-white/10 bg-gradient-to-br from-[#070916]/95 via-[#0b0f25]/90 to-[#131b3c]/85 p-4 shadow-[0_25px_45px_rgba(5,8,24,0.55)] backdrop-blur-2xl">
         <label className="block text-sm font-medium text-white/80 mb-2 tracking-wide uppercase">Select a School</label>
         <select
           value={selectedSchool}

@@ -11,26 +11,26 @@ L.Icon.Default.mergeOptions({
   shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
 });
 
-// Custom CSS-based marker icons
-const createCustomIcon = (color) => {
-  return L.divIcon({
-    className: 'custom-marker',
-    html: `<div style="
-      width: 20px;
-      height: 20px;
-      background-color: ${color};
-      border: 3px solid white;
-      border-radius: 50%;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.4);
-    "></div>`,
-    iconSize: [20, 20],
-    iconAnchor: [10, 10],
-    popupAnchor: [0, -10]
-  });
-};
+// Use default Leaflet markers
+const blueIcon = new L.Icon({
+  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
+  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41]
+});
 
-const blueIcon = createCustomIcon('#3b82f6');
-const redIcon = createCustomIcon('#ef4444');
+const redIcon = new L.Icon({
+  iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png',
+  iconRetinaUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41]
+});
 
 const MapController = ({ selectedSchool, schools }) => {
   const map = useMap();
@@ -56,13 +56,14 @@ const Map = ({ schools, onSchoolClick, selectedSchool }) => {
         center={[39.8283, -98.5795]} 
         zoom={4} 
         zoomControl={false}
+        attributionControl={false}
         className="w-full h-full galaxy-map"
         style={{ minHeight: '400px' }}
       >
         <MapController selectedSchool={selectedSchool} schools={schools} />
         <TileLayer
           url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+          attribution=''
         />
         
         {schools.map((school) => {
