@@ -10,16 +10,35 @@ const initialFilters = {
 }
 
 const testOptions = [
-  'Algebra',
-  'Humanities',
   'American Government',
+  'American Literature',
+  'Analyzing & Interpreting Literature',
   'Biology',
+  'Calculus',
   'Chemistry',
+  'College Algebra',
   'College Composition',
-  'History of the United States',
+  'College Mathematics',
+  'English Literature',
+  'Financial Accounting',
+  'French Language',
+  'German Language',
+  'History of the United States I',
+  'History of the United States II',
+  'Human Growth and Development',
+  'Information Systems',
+  'Introductory Business Law',
+  'Introductory Psychology',
+  'Introductory Sociology',
+  'Natural Sciences',
+  'Precalculus',
+  'Principles of Macroeconomics',
+  'Principles of Microeconomics',
   'Principles of Management',
-  'Spanish',
-  'Other'
+  'Principles of Marketing',
+  'Spanish Language',
+  'Western Civilization I',
+  'Western Civilization II'
 ]
 
 const Searchbar = ({ apiBaseUrl = DEFAULT_API_BASE_URL }) => {

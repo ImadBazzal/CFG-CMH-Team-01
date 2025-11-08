@@ -152,16 +152,35 @@ const ResultsPage = () => {
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
             >
               <option value="">All CLEP Exams</option>
-              <option value="Algebra">Algebra</option>
-              <option value="Humanities">Humanities</option>
               <option value="American Government">American Government</option>
+              <option value="American Literature">American Literature</option>
+              <option value="Analyzing & Interpreting Literature">Analyzing & Interpreting Literature</option>
               <option value="Biology">Biology</option>
+              <option value="Calculus">Calculus</option>
               <option value="Chemistry">Chemistry</option>
+              <option value="College Algebra">College Algebra</option>
               <option value="College Composition">College Composition</option>
-              <option value="History of the United States">History of the United States</option>
+              <option value="College Mathematics">College Mathematics</option>
+              <option value="English Literature">English Literature</option>
+              <option value="Financial Accounting">Financial Accounting</option>
+              <option value="French Language">French Language</option>
+              <option value="German Language">German Language</option>
+              <option value="History of the United States I">History of the United States I</option>
+              <option value="History of the United States II">History of the United States II</option>
+              <option value="Human Growth and Development">Human Growth and Development</option>
+              <option value="Information Systems">Information Systems</option>
+              <option value="Introductory Business Law">Introductory Business Law</option>
+              <option value="Introductory Psychology">Introductory Psychology</option>
+              <option value="Introductory Sociology">Introductory Sociology</option>
+              <option value="Natural Sciences">Natural Sciences</option>
+              <option value="Precalculus">Precalculus</option>
+              <option value="Principles of Macroeconomics">Principles of Macroeconomics</option>
+              <option value="Principles of Microeconomics">Principles of Microeconomics</option>
               <option value="Principles of Management">Principles of Management</option>
-              <option value="Spanish">Spanish</option>
-              <option value="Other">Other</option>
+              <option value="Principles of Marketing">Principles of Marketing</option>
+              <option value="Spanish Language">Spanish Language</option>
+              <option value="Western Civilization I">Western Civilization I</option>
+              <option value="Western Civilization II">Western Civilization II</option>
             </select>
           </div>
 
@@ -179,6 +198,21 @@ const ResultsPage = () => {
             max="80"
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
           />
+        </div>
+
+        {/* last updated */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Institution Policy Last Updated</label>
+          <select
+            value={filters.last_updated}
+            onChange={(e) => handleFilterChange('last_updated', e.target.value)}
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="">Any time</option>
+            <option value="1-6">1-6 months ago</option>
+            <option value="6-12">6-12 months ago</option>
+            <option value="12+">1+ years ago</option>
+          </select>
         </div>
 
           {/* city */}
