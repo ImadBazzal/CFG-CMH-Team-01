@@ -1,5 +1,8 @@
 import React, { useState } from 'react'
 
+// ---------------------------------------------
+// Mock Summaries (pre-written AI-generated text)
+// ---------------------------------------------
 const MOCK_SUMMARIES = [
   `
   You reported a score of 50 on the CLEP Biology exam. That places you in the same score band as students who typically receive 6 science credits at Metropolitan State, Northbridge University, and the MSU satellite campuses within 40 miles.
@@ -23,18 +26,30 @@ const MOCK_SUMMARIES = [
   `
 ].map(summary => summary.trim())
 
+// ------------------------------------------------------
+// Main Component: AISummaryPage
+// Displays a UI that generates random CLEP summary text
+// ------------------------------------------------------
 const AISummaryPage = () => {
+  // State for current summary text
   const [summary, setSummary] = useState('')
+  // State to check if a summary has been generated
   const [hasGenerated, setHasGenerated] = useState(false)
 
   return (
+    // ---------- Main Container with Gradient Background ----------
     <main className="relative flex min-h-screen w-full items-center justify-center overflow-hidden bg-[radial-gradient(circle_at_15%_20%,rgba(71,134,255,0.25),transparent_45%),radial-gradient(circle_at_80%_10%,rgba(255,86,180,0.25),transparent_40%),linear-gradient(135deg,#030712,#020310_55%,#050917)] px-4 py-10 sm:px-6 lg:px-12">
+      
+      {/* Decorative glowing background element */}
       <div
         className="pointer-events-none absolute -right-[10%] -top-[25%] h-[60vw] w-[60vw] rounded-full bg-[radial-gradient(circle,rgba(80,120,255,0.3),transparent_60%)] blur-[8px]"
         aria-hidden="true"
       />
 
+      {/* ---------- Main Content Section ---------- */}
       <section className="relative z-10 w-full max-w-3xl rounded-[32px] border border-white/10 bg-gradient-to-br from-[#070916]/90 to-[#0f1635]/80 p-8 shadow-[0_35px_65px_rgba(5,8,24,0.65)] backdrop-blur-2xl">
+
+        {/* ---------- Header Section ---------- */}
         <header className="mb-8 text-center">
           <p className="text-xs font-semibold uppercase tracking-[0.24em] text-white/60">
             Modern States
@@ -47,7 +62,10 @@ const AISummaryPage = () => {
           </p>
         </header>
 
+        {/* ---------- Summary Display Box ---------- */}
         <div className="rounded-3xl border border-white/10 bg-white/5 p-6 text-white">
+
+          {/* Header inside Summary Box */}
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-white/70">Summary Workspace</p>
@@ -58,22 +76,27 @@ const AISummaryPage = () => {
             </span>
           </div>
 
+          {/* Conditional Summary Output */}
           <div className="mt-6 rounded-2xl border border-dashed border-white/20 bg-white/5 px-5 py-8 text-white/80">
             {hasGenerated ? (
+              // If summary generated → show text
               <p className="whitespace-pre-line text-left text-base leading-relaxed text-white/90">
                 {summary}
               </p>
             ) : (
+              // Default placeholder before generation
               <p className="text-center text-white/60">
                 Your generated summary will appear here once it&apos;s ready.
               </p>
             )}
           </div>
 
+          {/* ---------- Generate Button ---------- */}
           <button
             type="button"
             className="mt-8 w-full rounded-2xl bg-gradient-to-r from-[#6f7dff] via-[#7f5dff] to-[#f97bff] px-6 py-3 text-base font-semibold text-white shadow-[0_18px_35px_rgba(111,125,255,0.35)] transition-all hover:-translate-y-0.5"
             onClick={() => {
+              // Pick random summary and display it
               const randomSummary = MOCK_SUMMARIES[Math.floor(Math.random() * MOCK_SUMMARIES.length)]
               setSummary(randomSummary)
               setHasGenerated(true)
