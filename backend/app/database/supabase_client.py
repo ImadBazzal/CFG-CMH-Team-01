@@ -11,6 +11,9 @@ supabase: Client = None
 if url and key:
     try:
         supabase = create_client(url, key)
+        print("Supabase client created successfully!")
     except Exception as e:
         print(f"Failed to create Supabase client: {e}")
         supabase = None
+else:
+    print("Cannot create Supabase client: Missing URL or key")
