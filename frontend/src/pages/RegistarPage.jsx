@@ -224,10 +224,10 @@ const RegistarPage = () => {
         <section className="relative z-10 w-full max-w-md rounded-[32px] border border-white/10 bg-gradient-to-br from-[#070916]/90 to-[#070b20]/70 p-6 sm:p-10 lg:p-14 shadow-panel backdrop-blur-3xl">
           <header className="text-center">
             <p className="text-xs font-semibold uppercase tracking-[0.24em] text-white/60">
-              CLEP acceptance pulse
+              CLEP ACCEPTANCE PULSE
             </p>
             <h1 className="mt-3 text-3xl font-semibold text-white sm:text-[2.4rem]">
-              Registrar console
+              Registar Console
             </h1>
             <p className="mt-3 text-base text-white/70">
               Sign in to manage your institution's CLEP acceptance status.
@@ -236,7 +236,7 @@ const RegistarPage = () => {
 
           <div className="mt-8">
             <label htmlFor="email" className="block text-sm font-semibold text-white/80 mb-3">
-              Institutional email
+              Institution Email
             </label>
             <input
               id="email"
@@ -244,7 +244,7 @@ const RegistarPage = () => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               onKeyPress={handleKeyPress}
-              placeholder="registrar@university.edu"
+              placeholder="registar@university.edu"
               className="w-full rounded-2xl border border-white/10 bg-white/5 px-5 py-3.5 text-base text-white placeholder-white/40 transition focus:border-white/30 focus:bg-white/10 focus:outline-none"
             />
           </div>
