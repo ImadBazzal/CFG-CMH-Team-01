@@ -201,7 +201,7 @@ const handleClepExamToggle = (exam) => {
 
   // UI
   return (
-    <div className="relative w-screen h-screen overflow-hidden bg-[radial-gradient(circle_at_15%_20%,rgba(71,134,255,0.25),transparent_45%),radial-gradient(circle_at_80%_10%,rgba(255,86,180,0.25),transparent_40%),linear-gradient(135deg,#030712,#020310_55%,#050917)]">
+    <div className="relative w-screen min-h-[calc(100vh-4rem)] overflow-hidden mt-16 bg-[radial-gradient(circle_at_15%_20%,rgba(71,134,255,0.25),transparent_45%),radial-gradient(circle_at_80%_10%,rgba(255,86,180,0.25),transparent_40%),linear-gradient(135deg,#030712,#020310_55%,#050917)]">
       {/* MAP */}
       <div className="absolute inset-0 z-10">
         {loading ? (
