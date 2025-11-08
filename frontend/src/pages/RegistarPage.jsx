@@ -227,7 +227,7 @@ const RegistarPage = () => {
               CLEP ACCEPTANCE PULSE
             </p>
             <h1 className="mt-3 text-3xl font-semibold text-white sm:text-[2.4rem]">
-              Registar Console
+              Registrar Console
             </h1>
             <p className="mt-3 text-base text-white/70">
               Sign in to manage your institution's CLEP acceptance status.
@@ -244,7 +244,7 @@ const RegistarPage = () => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               onKeyPress={handleKeyPress}
-              placeholder="registar@university.edu"
+              placeholder="registrar@university.edu"
               className="w-full rounded-2xl border border-white/10 bg-white/5 px-5 py-3.5 text-base text-white placeholder-white/40 transition focus:border-white/30 focus:bg-white/10 focus:outline-none"
             />
           </div>
