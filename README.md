@@ -18,7 +18,7 @@ Our Solution and Features:
 Future Visions:
 - AI Chatbot
 - Connecting backend fully and populating with real data
-- Admin Dashboard
+- Admin Dashboard with real-time statistics
 
 Tech Stack:
 - Frontend: React, JavaScript, Tailwind CSS
