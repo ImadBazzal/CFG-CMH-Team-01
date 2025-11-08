@@ -201,38 +201,26 @@ const Searchbar = ({ apiBaseUrl = DEFAULT_API_BASE_URL }) => {
               </div>
             </div>
 
-            {/* CLEP Test Score - replaced number input with a slider (0-80) */}
+            {/* CLEP Test Score - numeric input */}
             <div className="flex flex-col gap-3">
               <label className="text-sm font-medium text-white/80" htmlFor="testScore">
                 Test Score
               </label>
-              <div className="relative rounded-xl border border-white/10 bg-white/5 px-4 py-3.5 transition-all duration-200 focus-within:border-blue-400 focus-within:ring-2 focus-within:ring-blue-400/50 focus-within:bg-white/10 hover:bg-white/8">
-                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-white/60 font-medium text-sm">
-                  Score:
-                </div>
-
-                {/* Slider: keep styling consistent with the original control */}
+              <div className="relative">
                 <input
                   id="testScore"
                   name="testScore"
-                  type="range"
-                  min="0"
+                  type="number"
+                  min="20"
                   max="80"
-                  step="1"
-                  value={filters.score === '' ? 50 : Number(filters.score)}
-                  onChange={(e) => setFilters(prev => ({ ...prev, score: String(e.target.value) }))}
-                  className="w-full bg-transparent pl-16 text-base font-medium text-white placeholder-white/40 outline-none appearance-none slider"
-                  style={{
-                    colorScheme: 'dark'
-                  }}
+                  placeholder="Enter a score between 20-80"
+                  value={filters.score}
+                  onChange={handleScoreChange}
+                  className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3.5 text-base font-medium text-white placeholder-white/40 transition-all duration-200 focus:border-blue-400 focus:ring-2 focus:ring-blue-400/50 focus:bg-white/10 hover:bg-white/8 outline-none"
                 />
-
-                {/* Numeric display on the right, moved slightly below the slider track */}
-                <div className="absolute right-4 top-full translate-y-2 flex items-center gap-2">
-                  <span className="text-white/60 font-medium text-sm">
-                    {filters.score === '' ? '—' : filters.score}
-                  </span>
-                </div>
+                <p className="mt-2 text-xs text-white/50">
+                  Leave blank to see all accepted scores.
+                </p>
               </div>
             </div>
           </div>
@@ -277,47 +265,6 @@ const Searchbar = ({ apiBaseUrl = DEFAULT_API_BASE_URL }) => {
         }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover {
           background: rgba(94, 207, 255, 0.5);
-        }
-
-        /* Range slider styling to match the design */
-        input[type="range"].slider {
-          height: 28px;
-          -webkit-appearance: none;
-          background: transparent;
-        }
-        input[type="range"].slider:focus {
-          outline: none;
-        }
-        input[type="range"].slider::-webkit-slider-runnable-track {
-          width: 100%;
-          height: 8px;
-          background: linear-gradient(to right, #6f7dff, #5ecfff);
-          border-radius: 9999px;
-          opacity: 0.85;
-        }
-        input[type="range"].slider::-webkit-slider-thumb {
-          -webkit-appearance: none;
-          width: 18px;
-          height: 18px;
-          border-radius: 50%;
-          background: white;
-          border: 3px solid #6f7dff;
-          margin-top: -5px; /* center the thumb */
-          box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-        }
-        input[type="range"].slider::-moz-range-track {
-          width: 100%;
-          height: 8px;
-          background: linear-gradient(to right, #6f7dff, #5ecfff);
-          border-radius: 9999px;
-        }
-        input[type="range"].slider::-moz-range-thumb {
-          width: 18px;
-          height: 18px;
-          border-radius: 50%;
-          background: white;
-          border: 3px solid #6f7dff;
-          box-shadow: 0 2px 6px rgba(0,0,0,0.2);
         }
 
         /* Hide number input arrows (legacy fallback) */
