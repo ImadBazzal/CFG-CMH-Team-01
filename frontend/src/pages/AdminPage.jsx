@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 
 const AdminDashboard = ({ onLogout }) => {
   return (
@@ -29,11 +30,17 @@ const AdminDashboard = ({ onLogout }) => {
 }
 
 const AdminPage = () => {
+  const navigate = useNavigate()
   const [credentials, setCredentials] = useState({
     username: '',
     password: ''
   })
   const [isLoggedIn, setIsLoggedIn] = useState(false)
+
+  const handleSignOut = () => {
+    setIsLoggedIn(false)
+    navigate('/')  // Navigate to home page
+  }
 
   const handleSubmit = (e) => {
     e.preventDefault()
@@ -51,7 +58,7 @@ const AdminPage = () => {
   }
 
   if (isLoggedIn) {
-    return <AdminDashboard />
+    return <AdminDashboard onLogout={handleSignOut} />
   }
 
   return (
