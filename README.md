@@ -1,6 +1,6 @@
 # Team-1
 
-Modern States Problem Statement: How might a technology solution help Modern Solutions make it easier on the front end for learners, families, college advisors, and institutional partners (community stakeholders) to find up to date information about where they can use their CLEP exam scores to get college credit that moves them towards their degree goals - while also on the back end simplifying the process for colleges and universities to keep their CLEP acceptance policies up to date and for community stakeholders to add context about acceptance policies?
+Modern States Problem Statement: How might a technology solution help Modern States make it easier on the front end for learners, families, college advisors, and institutional partners (community stakeholders) to find up to date information about where they can use their CLEP exam scores to get college credit that moves them towards their degree goals - while also on the back end simplifying the process for colleges and universities to keep their CLEP acceptance policies up to date and for community stakeholders to add context about acceptance policies?
 
 Key Problems We Addressed: 
 - Broken/lack of recent data
