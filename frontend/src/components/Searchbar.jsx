@@ -227,8 +227,8 @@ const Searchbar = ({ apiBaseUrl = DEFAULT_API_BASE_URL }) => {
                   }}
                 />
 
-                {/* Numeric display on the right (preserves the previous layout) */}
-                <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-2">
+                {/* Numeric display on the right, moved slightly below the slider track */}
+                <div className="absolute right-4 top-full translate-y-2 flex items-center gap-2">
                   <span className="text-white/60 font-medium text-sm">
                     {filters.score === '' ? '—' : filters.score}
                   </span>
